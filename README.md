@@ -1,2 +1,2 @@
-# hissw
-Integrate SSW into your Python workflows (if you must)
+# hiss(w)
+IDL sucks. SSW sucks. Python does not. Wouldn't it be nice if we could easily call ssw-related routines from Python? hiss(w) let's you do that even though you shouldn't.
