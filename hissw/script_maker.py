@@ -58,7 +58,7 @@ class ScriptMaker(object):
 
     def _build_command_script(self,scripts,save_vars,save_filename,command_filename):
         """Generate command script and save to file"""
-        idl_commands = self.env.get_template('parent.com').render(
+        idl_commands = self.env.get_template('parent.pro').render(
                                         ssw_path_list=self.ssw_path_list,
                                         extra_paths=self.extra_paths,
                                         scripts=scripts,
@@ -86,7 +86,7 @@ class ScriptMaker(object):
         fn_template = os.path.join(self.hissw_home,
                     '{name}_'+datetime.datetime.now().strftime('%Y%m%d-%H%M%S')+'.{ext}')
         save_filename = fn_template.format(name='idl_vars',ext='sav')
-        command_filename = fn_template.format(name='idl_script',ext='com')
+        command_filename = fn_template.format(name='idl_script',ext='pro')
         shell_filename = fn_template.format(name='ssw_shell',ext='sh')
         #generate custom scripts
         scripts = self._build_custom_scripts(scripts_and_args)
