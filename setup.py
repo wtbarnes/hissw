@@ -10,5 +10,5 @@ setup(
     version='1.0dev',
     author='Will Barnes',
     url='https://github.com/wtbarnes/hissw',
-    packages=['hissw']
+    packages=['hissw','hissw.templates']
 )
