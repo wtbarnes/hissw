@@ -10,6 +10,6 @@ setup(
     version='1.0dev',
     author='Will Barnes',
     url='https://github.com/wtbarnes/hissw',
-    include_package_data=True,
+    package_data={'hissw':['templates/*']},
     packages=['hissw']
 )
