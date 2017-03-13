@@ -25,8 +25,8 @@ class ScriptMaker(object):
         self.ssw_path_list = ssw_path_list
         self.extra_paths = extra_paths
         self.env = Environment(
-            #loader=PackageLoader('hissw', 'templates'))
-            loader=FileSystemLoader(os.path.join(os.path.dirname(__file__), 'templates')))
+            loader=PackageLoader('hissw', 'templates'))
+            # loader=FileSystemLoader(os.path.join(os.path.dirname(__file__), 'templates')))
         if ssw_home is None:
             if defaults['ssw_home'] is None:
                 raise ValueError('''ssw_home must be set at instantiation or
