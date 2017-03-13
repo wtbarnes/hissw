@@ -5,22 +5,29 @@ import os
 import datetime
 import subprocess
 
-from jinja2 import Environment,Template,FileSystemLoader
+from jinja2 import (Environment,
+                    Template,
+                    # FileSystemLoader,
+                    PackageLoader)
 from scipy.io import readsav
 
 from .read_config import defaults
+
 
 class ScriptMaker(object):
     """
     Build and execute SSW IDL scripts
     """
 
-    def __init__(self,ssw_pkg_list=[], ssw_path_list=[], ssw_home=None, idl_home=None, hissw_home=None, extra_paths=[]):
+    def __init__(self, ssw_pkg_list=[], 
+                 ssw_path_list=[], ssw_home=None, idl_home=None, 
+                 hissw_home=None, extra_paths=[]):
         self.ssw_pkg_list = ssw_pkg_list
         self.ssw_path_list = ssw_path_list
         self.extra_paths = extra_paths
         self.env = Environment(
-            loader=FileSystemLoader(os.path.join(os.path.dirname(__file__),'templates')))
+            loader=PackageLoader('hissw', 'templates'))
+            #loader=FileSystemLoader(os.path.join(os.path.dirname(__file__),'templates')))
         if ssw_home is None:
             if defaults['ssw_home'] is None:
                 raise ValueError('''ssw_home must be set at instantiation or
@@ -46,7 +53,7 @@ class ScriptMaker(object):
         else:
             self.hissw_home = hissw_home
 
-    def _build_custom_scripts(self,scripts_and_args):
+    def _build_custom_scripts(self, scripts_and_args):
         """Generate user scripts from templates"""
         scripts = []
         env = Environment(
@@ -56,7 +63,8 @@ class ScriptMaker(object):
 
         return scripts
 
-    def _build_command_script(self,scripts,save_vars,save_filename,command_filename):
+    def _build_command_script(self, scripts, save_vars, save_filename, 
+                              command_filename):
         """Generate command script and save to file"""
         idl_commands = self.env.get_template('parent.pro').render(
                                         ssw_path_list=self.ssw_path_list,
@@ -64,25 +72,25 @@ class ScriptMaker(object):
                                         scripts=scripts,
                                         save_vars=save_vars,
                                         save_filename=save_filename)
-        with open(command_filename,'w') as f:
+        with open(command_filename, 'w') as f:
             f.write(idl_commands)
 
-    def _build_shell_script(self,command_filename,shell_filename):
+    def _build_shell_script(self, command_filename, shell_filename):
         """Generate shell script"""
         shell_script = self.env.get_template('startup.sh').render(
                                 ssw_home=self.ssw_home,
                                 idl_home=self.idl_home,
                                 ssw_pkg_list=self.ssw_pkg_list,
                                 command_filename=command_filename)
-        with open(shell_filename,'w') as f:
+        with open(shell_filename, 'w') as f:
             f.write(shell_script)
 
-    def run(self,scripts_and_args,save_vars=[]):
+    def run(self, scripts_and_args, save_vars=[]):
         """
         Generate shell script, run it, and return dictionary with variables
         from IDL session
         """
-        #generate filename for IDL sav file
+        # generate filename for IDL sav file
         fn_template = os.path.join(self.hissw_home,
                     '{name}_'+datetime.datetime.now().strftime('%Y%m%d-%H%M%S')+'.{ext}')
         save_filename = fn_template.format(name='idl_vars',ext='sav')
