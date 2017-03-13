@@ -1,13 +1,12 @@
-'''
+"""
 Build SSW scripts from Jinja 2 templates
-'''
+"""
 import os
 import datetime
 import subprocess
 
 from jinja2 import (Environment,
-                    Template,
-                    # FileSystemLoader,
+                    FileSystemLoader,
                     PackageLoader)
 from scipy.io import readsav
 
@@ -57,9 +56,14 @@ class ScriptMaker(object):
         """Generate user scripts from templates"""
         scripts = []
         env = Environment(
-            loader=FileSystemLoader([os.path.dirname(sa[0]) for sa in scripts_and_args]))
+            loader=FileSystemLoader([os.path.dirname(sa[0])
+                                     for sa in scripts_and_args
+                                     if os.path.isfile(sa[0])]))
         for sa in scripts_and_args:
-            scripts.append(env.get_template(os.path.basename(sa[0])).render(**sa[1]))
+            if os.path.isfile(sa[0]):
+                scripts.append(env.get_template(os.path.basename(sa[0])).render(**sa[1]))
+            else:
+                scripts.append(env.from_string(sa[0]).render(**sa[1]))
 
         return scripts
 

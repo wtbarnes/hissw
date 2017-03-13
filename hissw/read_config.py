@@ -1,6 +1,6 @@
-'''
+"""
 Read some default options if possible
-'''
+"""
 
 import os
 
