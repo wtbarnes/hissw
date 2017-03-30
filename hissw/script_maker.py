@@ -18,14 +18,12 @@ class ScriptMaker(object):
     Build and execute SSW IDL scripts
     """
 
-    def __init__(self, ssw_pkg_list=[], 
-                 ssw_path_list=[], ssw_home=None, idl_home=None, 
+    def __init__(self, ssw_pkg_list=[], ssw_path_list=[], ssw_home=None, idl_home=None,
                  hissw_home=None, extra_paths=[]):
         self.ssw_pkg_list = ssw_pkg_list
         self.ssw_path_list = ssw_path_list
         self.extra_paths = extra_paths
-        self.env = Environment(
-            loader=PackageLoader('hissw', 'templates'))
+        self.env = Environment(loader=PackageLoader('hissw', 'templates'))
         if ssw_home is None:
             if defaults['ssw_home'] is None:
                 raise ValueError('''ssw_home must be set at instantiation or
@@ -88,25 +86,33 @@ class ScriptMaker(object):
         with open(shell_filename, 'w') as f:
             f.write(shell_script)
 
-    def run(self, scripts_and_args, save_vars=[]):
+    def run(self, scripts_and_args, save_vars=[], cleanup=True, verbose=True):
         """
         Generate shell script, run it, and return dictionary with variables
         from IDL session
         """
         # generate filename for IDL sav file
-        fn_template = os.path.join(self.hissw_home,
-                    '{name}_'+datetime.datetime.now().strftime('%Y%m%d-%H%M%S')+'.{ext}')
-        save_filename = fn_template.format(name='idl_vars',ext='sav')
-        command_filename = fn_template.format(name='idl_script',ext='pro')
-        shell_filename = fn_template.format(name='ssw_shell',ext='sh')
-        #generate custom scripts
+        fn_template = os.path.join(self.hissw_home, '{name}_'+datetime.datetime.now().strftime('%Y%m%d-%H%M%S')+'.{ext}')
+        save_filename = fn_template.format(name='idl_vars', ext='sav')
+        command_filename = fn_template.format(name='idl_script', ext='pro')
+        shell_filename = fn_template.format(name='ssw_shell', ext='sh')
+        # generate custom scripts
         scripts = self._build_custom_scripts(scripts_and_args)
-        #generate commands and save to file
-        self._build_command_script(scripts,save_vars,save_filename,command_filename)
-        #generate shell script
-        self._build_shell_script(command_filename,shell_filename)
-        #run the shell script
-        subprocess.call(['chmod','u+x',shell_filename])
-        subprocess.check_output(shell_filename,shell=True)
+        # generate commands and save to file
+        self._build_command_script(scripts, save_vars, save_filename, command_filename)
+        # generate shell script
+        self._build_shell_script(command_filename, shell_filename)
+        # run the shell script
+        subprocess.call(['chmod', 'u+x', shell_filename])
+        idl_output = subprocess.check_output(shell_filename, shell=True)
+        if verbose:
+            print(idl_output)
+        # get results from save file
+        results = readsav(save_filename)
+        # delete scripts
+        if cleanup:
+            subprocess.call(['rm', command_filename])
+            subprocess.call(['rm', shell_filename])
+            subprocess.call(['rm', save_filename])
 
-        return readsav(save_filename)
+        return results
