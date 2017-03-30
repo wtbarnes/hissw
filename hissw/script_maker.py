@@ -104,9 +104,12 @@ class ScriptMaker(object):
         self._build_shell_script(command_filename, shell_filename)
         # run the shell script
         subprocess.call(['chmod', 'u+x', shell_filename])
-        idl_output = subprocess.check_output(shell_filename, shell=True)
-        if verbose:
-            print(idl_output)
+        try:
+            cmd_output = subprocess.check_output(shell_filename, shell=True, stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError as exc:
+            print(exc.output)
+        else: 
+            if verbose: print(cmd_output.decode('utf-8'))
         # get results from save file
         results = readsav(save_filename)
         # delete scripts
