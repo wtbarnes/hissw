@@ -1,4 +1,4 @@
-# hiss(w)
+# :snake: hiss(w)
 Include those pesky SSWIDL scripts in your Python workflow.
 
 The SSWIDL (or [SolarSoftware](http://www.lmsal.com/solarsoft/)) stack contains nearly every piece of software a solar physicist needs. While libraries like [Astropy](), [SunPy](), and [ChiantiPy]() provide Python equivalents to many of these IDL packages, there's still a lot of functionality only available in SSW and not enough hours in the day to rewrite it all in Python.
