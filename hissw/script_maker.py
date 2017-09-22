@@ -19,17 +19,24 @@ class ScriptMaker(object):
 
     Parameters
     ----------
-    ssw_pkg_list : list
-        List of SSW packages
-    ssw_path_list : list
+    ssw_packages : list
+        List of SSW packages to load, e.g. 'sdo/aia', 'chianti'
+    ssw_paths : list
+        List of SSW paths to pass to `ssw_path`
+    extra_paths : list
+        Additional paths to add to the IDL namespace
     ssw_home : str
+        Optional, root of SSW tree
     idl_home : str
+        Optional, IDL executable
+    hissw_home : str
+        Optional, where to save temp files
     """
 
-    def __init__(self, ssw_pkg_list=None, ssw_path_list=None, ssw_home=None, idl_home=None,
-                 hissw_home=None, extra_paths=None):
-        self.ssw_pkg_list = ssw_pkg_list if ssw_pkg_list is not None else []
-        self.ssw_path_list = ssw_path_list if ssw_path_list is not None else []
+    def __init__(self, ssw_packages=None, ssw_paths=None, extra_paths=None,
+                 ssw_home=None, idl_home=None, hissw_home=None):
+        self.ssw_packages = ssw_packages if ssw_packages is not None else []
+        self.ssw_paths = ssw_paths if ssw_paths is not None else []
         self.extra_paths = extra_paths if extra_paths is not None else []
         self.env = Environment(loader=PackageLoader('hissw', 'templates'))
         self.setup_home(ssw_home, idl_home, hissw_home)
@@ -69,7 +76,7 @@ class ScriptMaker(object):
         """
         if save_vars is None:
             save_vars = []
-        params = {'ssw_path_list': self.ssw_path_list, 'extra_paths': self.extra_paths, 'scripts': scripts,
+        params = {'ssw_paths': self.ssw_paths, 'extra_paths': self.extra_paths, 'scripts': scripts,
                   'save_vars': save_vars, 'save_filename': save_filename}
         idl_commands = self.env.get_template('parent.pro').render(**params)
         with open(command_filename, 'w') as f:
@@ -79,7 +86,7 @@ class ScriptMaker(object):
         """
         Generate shell script for starting up SSWIDL
         """
-        params = {'ssw_home': self.ssw_home, 'ssw_pkg_list': self.ssw_pkg_list,
+        params = {'ssw_home': self.ssw_home, 'ssw_packages': self.ssw_packages,
                   'idl_home': self.idl_home, 'command_filename': command_filename}
         shell_script = self.env.get_template('startup.sh').render(**params)
         with open(shell_filename, 'w') as f:

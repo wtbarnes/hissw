@@ -2,7 +2,7 @@
 # Set SSW home
 setenv SSW {{ssw_home}}
 # Set SSW instruments
-setenv SSW_INSTR "{{ ssw_pkg_list | join(' ') }}"
+setenv SSW_INSTR "{{ ssw_packages | join(' ') }}"
 # Setup needed environment variables
 source $SSW/gen/setup/setup.ssw
 # Setup IDL environment
