@@ -18,6 +18,14 @@ $ git clone https://github.com/wtbarnes/hissw.git
 $ cd hissw && python setup.py install
 ```
 
+**Note: hissw relies on executing several shell commands in the background and as a consequence Windows is not supported.** Finally, create the `~/.hissw/hisswrc` config script to tell hissw where to look for IDL and SSW,
+
+```yaml
+[hissw]
+ssw_home=/path/to/sww
+idl_home=/path/to/idl 
+```
+
 ## Example
 Calculate the 94 angstrom AIA response function, interpolate it to a Numpy array, and plot it in matplotlib.
 
