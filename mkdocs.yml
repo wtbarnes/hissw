@@ -1,5 +1,39 @@
+# Site Info
 site_name: hissw
+site_description: Run SSW IDL code in Python
+site_author: Will Barnes
+site_url: 'https://wtbarnes.github.io/hissw'
+
+# Repository
+repo_name: wtbarnes/hissw
+repo_url: https://github.com/wtbarnes/hissw
+
+# Navigation
 pages:
-- Home: index.md
-- Examples: examples.md
-theme: readthedocs
+- Getting Started: index.md
+- Examples:
+    - 'Simple Example' : 'examples/simple_example.md'
+    - 'AIA Response Functions' : 'examples/aia_example.md'
+    - 'Continuum Emission with CHIANTI' : 'examples/chianti_example.md'
+    - 'Differential Emission Measure' : 'examples/demreg_example.md'
+theme:
+  name: 'material'
+  palette:
+    primary: 'deep purple'
+    accent: 'deep purple'
+  logo:
+    icon: 'code'
+
+# Extensions
+markdown_extensions:
+  - codehilite
+
+# Social/Contact
+extra:
+  social:
+    - type: 'globe'
+      link: 'https://wtbarnes.github.io/'
+    - type: 'github'
+      link: 'https://github.com/wtbarnes'
+    - type: 'twitter'
+      link: 'https://twitter.com/wtbarnes_'
