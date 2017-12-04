@@ -1,9 +1,5 @@
 # :snake: :sunny: hiss(w)
-Include those pesky SSWIDL scripts in your Python workflow.
-
-The SSWIDL (or [SolarSoftware](http://www.lmsal.com/solarsoft/)) stack contains nearly every piece of software a solar physicist needs. While libraries like [Astropy](http://www.astropy.org/), [SunPy](http://sunpy.org/), and [ChiantiPy](https://github.com/chianti-atomic/ChiantiPy) provide Python equivalents to many of these IDL packages, there's still a lot of functionality only available in SSW and not enough hours in the day to rewrite it all in Python.
-
-**hissw** is a lightweight package that allows you to write IDL scripts (either inline or in a separate file) which use your installed SSW packages and return the results to your local Python namespace. hissw uses Jinja2 templates to generate SSW startup scripts and then runs your IDL code in the background. You can also use Jinja syntax to inject arguments from Python into IDL. The results are then saved to a file and then loaded back in using the amazing [`readsav()` function in `scipy.io`](https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.io.readsav.html).
+Include those pesky SSWIDL scripts in your Python workflow. See the [docs](#) for more info.
 
 ## Install
 hissw depends on the following Python packages,
