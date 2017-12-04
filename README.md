@@ -18,37 +18,7 @@ $ git clone https://github.com/wtbarnes/hissw.git
 $ cd hissw && python setup.py install
 ```
 
-**Note: hissw relies on executing several shell commands in the background and as a consequence Windows is not supported.** Finally, create the `~/.hissw/hisswrc` config script to tell hissw where to look for IDL and SSW,
-
-```yaml
-[hissw]
-ssw_home=/path/to/sww
-idl_home=/path/to/idl 
-```
-
-## Example
-Calculate the 94 angstrom AIA response function, interpolate it to a Numpy array, and plot it in matplotlib.
-
-```python
->>> import numpy as np
->>> import matplotlib.pyplot as plt
->>> import hissw
->>> script = """
-response = aia_get_response(/{{ flags | join(',/') }})
-logte = response.logte
-resp94 = response.a94.tresp
-interp_logte = {{ interp_logte }}
-interp_resp94 = interpol(resp94,logte,interp_logte)
-"""
->>> interp_logte = np.linspace(5,8,1000)
->>> flags = ['temp','dn','timedepend_date','evenorm']
->>> ssw = hissw.ScriptMaker(ssw_pkg_list=['sdo/aia'], ssw_path_list=['aia'])
->>> inputs = {'flags': flags, 'interp_logte': interp_logte.tolist()}
->>> ssw_resp = ssw.run([(script, inputs)])
->>> plt.plot(ssw_resp['logte'], ssw_resp['resp94'], 'o')
->>> plt.plot(interp_logte, ssw_resp['interp_resp94'], '--')
->>> plt.show()
-```
+**Note: hissw relies on executing several shell commands in the background and as a consequence Windows is not supported.** 
 
 ## Reporting Issues and Contributing
 Open an [issue on GitHub](https://github.com/wtbarnes/hissw/issues) to report a problem. [Pull requests](https://github.com/wtbarnes/hissw/pulls) welcome.
