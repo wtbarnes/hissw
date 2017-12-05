@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    
+    <url>
+     <loc>https://wtbarnes.github.io/hissw/</loc>
+     <lastmod>2017-12-05</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+        
+    <url>
+     <loc>https://wtbarnes.github.io/hissw/examples/simple_example/</loc>
+     <lastmod>2017-12-05</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>https://wtbarnes.github.io/hissw/examples/aia_example/</loc>
+     <lastmod>2017-12-05</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>https://wtbarnes.github.io/hissw/examples/chianti_example/</loc>
+     <lastmod>2017-12-05</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>https://wtbarnes.github.io/hissw/examples/demreg_example/</loc>
+     <lastmod>2017-12-05</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+</urlset>
