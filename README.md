@@ -1,5 +1,7 @@
 # :snake: :sunny: hiss(w)
-Include those pesky SSWIDL scripts in your Python workflow. See the [docs](#) for more info.
+[![Build Status](https://travis-ci.org/wtbarnes/hissw.svg?branch=master)](https://travis-ci.org/wtbarnes/hissw)
+
+Include those pesky SSWIDL scripts in your Python workflow. See the [docs](https://wtbarnes.github.io/hissw/) for more info.
 
 ## Install
 hissw depends on the following Python packages,
