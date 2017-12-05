@@ -55,28 +55,26 @@ class ScriptMaker(object):
         if self.hissw_home is None:
             raise ValueError('''hissw_home must be set at instantiation or in the hisswrc file.''')
 
-    def _build_custom_scripts(self, scripts_and_args):
+    def _build_custom_scripts(self, script, args):
         """
         Generate custom IDL scripts from templates
         """
-        scripts = []
-        env = Environment(loader=FileSystemLoader([os.path.dirname(sa[0]) for sa in scripts_and_args
-                                                   if os.path.isfile(sa[0])]))
-        for sa in scripts_and_args:
-            if os.path.isfile(sa[0]):
-                scripts.append(env.get_template(os.path.basename(sa[0])).render(**sa[1]))
-            else:
-                scripts.append(env.from_string(sa[0]).render(**sa[1]))
+        if os.path.isfile(script):
+            env = Environment(loader=FileSystemLoader(os.path.dirname(script)))
+            idl_script = env.get_template(os.path.basename(script)).render(**args)
+        else:
+            env = Environment()
+            idl_script = env.from_string(script).render(**args)
 
-        return scripts
+        return idl_script
 
-    def _build_command_script(self, scripts, save_vars, save_filename, command_filename):
+    def _build_command_script(self, script, save_vars, save_filename, command_filename):
         """
         Generate parent IDL script
         """
         if save_vars is None:
             save_vars = []
-        params = {'ssw_paths': self.ssw_paths, 'extra_paths': self.extra_paths, 'scripts': scripts,
+        params = {'ssw_paths': self.ssw_paths, 'extra_paths': self.extra_paths, 'script': script,
                   'save_vars': save_vars, 'save_filename': save_filename}
         idl_commands = self.env.get_template('parent.pro').render(**params)
         with open(command_filename, 'w') as f:
@@ -92,29 +90,32 @@ class ScriptMaker(object):
         with open(shell_filename, 'w') as f:
             f.write(shell_script)
 
-    def run(self, scripts_and_args, save_vars=None, cleanup=True, verbose=True):
+    def run(self, script, args=None, save_vars=None, cleanup=True, verbose=True):
         """
         Set up the SSWIDL environment and run the supplied scripts.
 
         Parameters
         ----------
-        scripts_and_args : list
-            List of tuples containing IDL scripts and arguments
-        save_vars : list
+        script : str
+            Literal script or path to script file
+        args : dict, optional
+            Input arguments to script
+        save_vars : list, optional
             Variables to save and return from the IDL namespace
-        cleanup : bool
+        cleanup : bool, optional
             Delete temporary shell and .sav files
-        verbose : bool
+        verbose : bool, optional
         """
+        args = {} if args is None else args
         # generate filename for IDL sav file
         fn_template = os.path.join(self.hissw_home, '{name}_'+datetime.datetime.now().strftime('%Y%m%d-%H%M%S')+'.{ext}')
         save_filename = fn_template.format(name='idl_vars', ext='sav')
         command_filename = fn_template.format(name='idl_script', ext='pro')
         shell_filename = fn_template.format(name='ssw_shell', ext='sh')
         # generate custom scripts
-        scripts = self._build_custom_scripts(scripts_and_args)
+        idl_script = self._build_custom_scripts(script, args)
         # generate commands and save to file
-        self._build_command_script(scripts, save_vars, save_filename, command_filename)
+        self._build_command_script(idl_script, save_vars, save_filename, command_filename)
         # generate shell script
         self._build_shell_script(command_filename, shell_filename)
         # run the shell script
@@ -124,7 +125,8 @@ class ScriptMaker(object):
         except subprocess.CalledProcessError as exc:
             print(exc.output)
         else:
-            if verbose: print(cmd_output.decode('utf-8'))
+            if verbose:
+                print(cmd_output.decode('utf-8'))
         # get results from save file
         results = readsav(save_filename)
         # delete scripts

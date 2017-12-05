@@ -5,9 +5,7 @@ ssw_path,/{{ ssw_paths | join(', /') }}
 ;add any other paths we need to the IDL path
 !PATH=!PATH{%for p in extra_paths%}+':'+EXPAND_PATH('{{p}}'){%endfor%}
 ;run user scripts
-{% for s in scripts %}
-{{ s }}
-{% endfor %}
+{{ script }}
 ;save workspace or desired variables
 save,{% for var in save_vars %}{{ var }},{% endfor %}filename='{{ save_filename }}'
 ;exit sswidl
