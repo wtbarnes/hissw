@@ -10,7 +10,7 @@ j = REBIN(TRANSPOSE(LINDGEN(n)), n, n)
 mask = (i GE j)
 '''
 ssw = hissw.ScriptMaker()
-results = ssw.run([(script, {})])
+results = ssw.run(script)
 plt.imshow(results['mask'])
 ```
 
@@ -26,8 +26,7 @@ i = REBIN(LINDGEN(n), n, n)
 j = REBIN(TRANSPOSE(LINDGEN(n)), n, n)
 mask = (i GE j)
 '''
-ssw = hissw.ScriptMaker()
-results = ssw.run([(script, {'n': 100})])
+results = ssw.run(script, args={'n': 100})
 plt.imshow(results['mask'])
 ```
 ![Example 2](../images/ex2.png)

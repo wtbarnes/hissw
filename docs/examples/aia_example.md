@@ -27,9 +27,9 @@ interp_resp335 = interpol(resp335,logte,interp_logte)
 """
 interp_logt = np.linspace(5,8,1000)
 flags = ['temp','dn','timedepend_date','evenorm']
-ssw = hissw.ScriptMaker(ssw_pkg_list=['sdo/aia'], ssw_path_list=['aia'])
+ssw = hissw.ScriptMaker(ssw_packages=['sdo/aia'], ssw_paths=['aia'])
 inputs = {'flags': flags, 'interp_logt': interp_logt.tolist()}
-ssw_resp = ssw.run([(script, inputs)])
+ssw_resp = ssw.run(script, args=inputs)
 # Plotting
 t = 10.**ssw_resp['logte']
 interp_t = 10.**interp_logte
