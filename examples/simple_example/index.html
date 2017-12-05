@@ -329,7 +329,7 @@
 <span class="s1">mask = (i GE j)</span>
 <span class="s1">&#39;&#39;&#39;</span>
 <span class="n">ssw</span> <span class="o">=</span> <span class="n">hissw</span><span class="o">.</span><span class="n">ScriptMaker</span><span class="p">()</span>
-<span class="n">results</span> <span class="o">=</span> <span class="n">ssw</span><span class="o">.</span><span class="n">run</span><span class="p">([(</span><span class="n">script</span><span class="p">,</span> <span class="p">{})])</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">ssw</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">script</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;mask&#39;</span><span class="p">])</span>
 </pre></div>
 
@@ -343,8 +343,7 @@
 <span class="s1">j = REBIN(TRANSPOSE(LINDGEN(n)), n, n)</span>
 <span class="s1">mask = (i GE j)</span>
 <span class="s1">&#39;&#39;&#39;</span>
-<span class="n">ssw</span> <span class="o">=</span> <span class="n">hissw</span><span class="o">.</span><span class="n">ScriptMaker</span><span class="p">()</span>
-<span class="n">results</span> <span class="o">=</span> <span class="n">ssw</span><span class="o">.</span><span class="n">run</span><span class="p">([(</span><span class="n">script</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">})])</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">ssw</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">script</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">})</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;mask&#39;</span><span class="p">])</span>
 </pre></div>
 
