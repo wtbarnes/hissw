@@ -319,37 +319,50 @@
                 
                   <h1>AIA Response Functions</h1>
                 
-                <p>The temperature response functions of the EUV channels of the Atmospheric Imaging Assembly (AIA) are used to understand the temperature of the plasma observed by the different telescopes on the instrument. </p>
-<p>While these are difficult to calculate, SSW provides a single simple routine to calculate them. The script below shows how you can easily calculate them using hissw and return the results to your current Python workspace and plot them with Matplotlib.</p>
+                <p>The temperature response functions of the EUV channels of the Atmospheric Imaging Assembly (AIA) are used to understand the temperature of the plasma observed by the different telescopes on the instrument. While these are difficult to calculate, SSW provides a single simple routine to calculate them.</p>
+<p>First, import the needed libraries,</p>
 <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">hissw</span>
-<span class="n">script</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">response = aia_get_response(/{{ flags | join(&#39;,/&#39;) }})</span>
-<span class="s2">; Pull needed elements out of structure</span>
-<span class="s2">logt = response.logte</span>
-<span class="s2">resp94 = response.a94.tresp</span>
-<span class="s2">resp131 = response.a131.tresp</span>
-<span class="s2">resp171 = response.a171.tresp</span>
-<span class="s2">resp193 = response.a193.tresp</span>
-<span class="s2">resp211 = response.a211.tresp</span>
-<span class="s2">resp335 = response.a335.tresp</span>
-<span class="s2">; Interpolate</span>
-<span class="s2">interp_logt = {{ interp_logt }}</span>
-<span class="s2">interp_resp94 = interpol(resp94,logte,interp_logte)</span>
-<span class="s2">interp_resp131 = interpol(resp131,logte,interp_logte)</span>
-<span class="s2">interp_resp171 = interpol(resp171,logte,interp_logte)</span>
-<span class="s2">interp_resp193 = interpol(resp193,logte,interp_logte)</span>
-<span class="s2">interp_resp211 = interpol(resp211,logte,interp_logte)</span>
-<span class="s2">interp_resp335 = interpol(resp335,logte,interp_logte)</span>
-<span class="s2">&quot;&quot;&quot;</span>
-<span class="n">interp_logt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Next, we need to write the IDL code that will calculate the response functions. Because it is a bit long, we'll put it in a separate file, <code>calc_aia_response.pro</code>. Note the Jinja2 syntax (denoted by the <code>{{}}</code>) we use to inject our Python variables into the script.</p>
+<div class="codehilite"><pre><span></span>response <span class="o">=</span> aia_get_response(<span class="o">/</span>{{ flags | join(<span class="s1">&#39;,/&#39;</span>) }})
+<span class="c c-Singleline">; Pull needed elements out of structure</span>
+logt <span class="o">=</span> response.logte
+resp94 <span class="o">=</span> response.a94.tresp
+resp131 <span class="o">=</span> response.a131.tresp
+resp171 <span class="o">=</span> response.a171.tresp
+resp193 <span class="o">=</span> response.a193.tresp
+resp211 <span class="o">=</span> response.a211.tresp
+resp335 <span class="o">=</span> response.a335.tresp
+<span class="c c-Singleline">; Interpolate</span>
+interp_logt <span class="o">=</span> {{ interp_logt }}
+interp_resp94 <span class="o">=</span> <span class="nb">interpol</span>(resp94,logte,interp_logte)
+interp_resp131 <span class="o">=</span> <span class="nb">interpol</span>(resp131,logte,interp_logte)
+interp_resp171 <span class="o">=</span> <span class="nb">interpol</span>(resp171,logte,interp_logte)
+interp_resp193 <span class="o">=</span> <span class="nb">interpol</span>(resp193,logte,interp_logte)
+interp_resp211 <span class="o">=</span> <span class="nb">interpol</span>(resp211,logte,interp_logte)
+interp_resp335 <span class="o">=</span> <span class="nb">interpol</span>(resp335,logte,interp_logte)
+</pre></div>
+
+
+<p>One of the best parts of <strong>hissw</strong> is that we can setup all of our input arguments in Python. Note that arrays have to be formatted as lists.</p>
+<div class="codehilite"><pre><span></span><span class="n">interp_logt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
 <span class="n">flags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">,</span><span class="s1">&#39;dn&#39;</span><span class="p">,</span><span class="s1">&#39;timedepend_date&#39;</span><span class="p">,</span><span class="s1">&#39;evenorm&#39;</span><span class="p">]</span>
-<span class="n">ssw</span> <span class="o">=</span> <span class="n">hissw</span><span class="o">.</span><span class="n">ScriptMaker</span><span class="p">(</span><span class="n">ssw_packages</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sdo/aia&#39;</span><span class="p">],</span> <span class="n">ssw_paths</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;aia&#39;</span><span class="p">])</span>
 <span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="n">flags</span><span class="p">,</span> <span class="s1">&#39;interp_logt&#39;</span><span class="p">:</span> <span class="n">interp_logt</span><span class="o">.</span><span class="n">tolist</span><span class="p">()}</span>
-<span class="n">ssw_resp</span> <span class="o">=</span> <span class="n">ssw</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">script</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">inputs</span><span class="p">)</span>
-<span class="c1"># Plotting</span>
-<span class="n">t</span> <span class="o">=</span> <span class="mf">10.</span><span class="o">**</span><span class="n">ssw_resp</span><span class="p">[</span><span class="s1">&#39;logte&#39;</span><span class="p">]</span>
+</pre></div>
+
+
+<p>Now create the SSW script environment and run the script. We need to include the SDO/AIA package (<a href="http://www.lmsal.com/solarsoft/">which you'll need to install with SSW if you haven't already</a>) so that the appropriate files are added to the IDL path.</p>
+<div class="codehilite"><pre><span></span><span class="n">ssw</span> <span class="o">=</span> <span class="n">hissw</span><span class="o">.</span><span class="n">ScriptMaker</span><span class="p">(</span><span class="n">ssw_packages</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sdo/aia&#39;</span><span class="p">],</span> <span class="n">ssw_paths</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;aia&#39;</span><span class="p">])</span>
+<span class="n">ssw_resp</span> <span class="o">=</span> <span class="n">ssw</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;/path/to/calc_aia_response.pro&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">inputs</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Finally, plot the response functions for all 6 EUV channels, showing the original (dots) and interpolated (line) values,</p>
+<div class="codehilite"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="mf">10.</span><span class="o">**</span><span class="n">ssw_resp</span><span class="p">[</span><span class="s1">&#39;logte&#39;</span><span class="p">]</span>
 <span class="n">interp_t</span> <span class="o">=</span> <span class="mf">10.</span><span class="o">**</span><span class="n">interp_logte</span>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">channel</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="mi">94</span><span class="p">,</span><span class="mi">131</span><span class="p">,</span><span class="mi">171</span><span class="p">,</span><span class="mi">193</span><span class="p">,</span><span class="mi">211</span><span class="p">,</span><span class="mi">335</span><span class="p">]):</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">ssw_resp</span><span class="p">[</span><span class="n">f</span><span class="s1">&#39;resp{channel}&#39;</span><span class="p">],</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">f</span><span class="s1">&#39;C{i}&#39;</span><span class="p">,</span> <span class="n">markevery</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
