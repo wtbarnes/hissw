@@ -16,7 +16,12 @@ $ git clone https://github.com/wtbarnes/hissw.git
 $ cd hissw && python setup.py install
 ```
 
-**Note: hissw relies on executing several shell commands in the background and as a consequence Windows is not supported.** 
+You can then run the tests to make sure everything is working alright,
+```
+$ pytest
+```
+
+**Note: hissw relies on executing several shell commands in the background and as a consequence Windows is (likely) not supported.** 
 
 ## Reporting Issues and Contributing
 Open an [issue on GitHub](https://github.com/wtbarnes/hissw/issues) to report a problem. [Pull requests](https://github.com/wtbarnes/hissw/pulls) welcome.

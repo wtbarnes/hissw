@@ -32,6 +32,12 @@ ssw_home=/path/to/ssw/tree
 idl_home=/path/to/local/idl/install
 ```
 
+and then run the tests to make sure everything is working properly
+
+```shell
+$ pytest
+```
+
 ## Bridging the IDL-Python Gap the Bad Way...
 
 ## Word(s) of Caution
