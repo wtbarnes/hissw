@@ -6,7 +6,7 @@ import pytest
 import hissw
 from hissw.util import SSWIDLError
 
-run_kwargs = {'verbose': True, 'cleanup': True}
+run_kwargs = {'verbose': True}
 
 
 @pytest.fixture

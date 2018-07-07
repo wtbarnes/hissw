@@ -21,31 +21,29 @@ class ScriptMaker(object):
 
     Parameters
     ----------
-    ssw_packages : list
+    ssw_packages : list, optional
         List of SSW packages to load, e.g. 'sdo/aia', 'chianti'
-    ssw_paths : list
+    ssw_paths : list, optional
         List of SSW paths to pass to `ssw_path`
-    extra_paths : list
+    extra_paths : list, optional
         Additional paths to add to the IDL namespace
-    ssw_home : str
-        Optional, root of SSW tree
-    idl_home : str
-        Optional, IDL executable
-    hissw_home : str
-        Optional, where to save temp files
+    ssw_home : str, optional
+        Root of SSW tree
+    idl_home : str, optional
+        Path to IDL executable
     """
 
     def __init__(self, ssw_packages=None, ssw_paths=None, extra_paths=None,
-                 ssw_home=None, idl_home=None, hissw_home=None):
+                 ssw_home=None, idl_home=None,):
         self.ssw_packages = ssw_packages if ssw_packages is not None else []
         self.ssw_paths = ssw_paths if ssw_paths is not None else []
         self.extra_paths = extra_paths if extra_paths is not None else []
         self.env = Environment(loader=PackageLoader('hissw', 'templates'))
-        self.setup_home(ssw_home, idl_home, hissw_home)
+        self._setup_home(ssw_home, idl_home,)
 
-    def setup_home(self, ssw_home, idl_home, hissw_home):
+    def _setup_home(self, ssw_home, idl_home,):
         """
-        Setup SSW, IDL, and hissw home locations
+        Setup SSW and IDL home locations
         """
         self.ssw_home = defaults['ssw_home'] if ssw_home is None else ssw_home
         if self.ssw_home is None:
@@ -53,9 +51,6 @@ class ScriptMaker(object):
         self.idl_home = defaults['idl_home'] if idl_home is None else idl_home
         if self.idl_home is None:
             raise ValueError('''idl_home must be set at instantiation or in the hisswrc file.''')
-        self.hissw_home = defaults['hissw_home'] if hissw_home is None else hissw_home
-        if self.hissw_home is None:
-            raise ValueError('''hissw_home must be set at instantiation or in the hisswrc file.''')
 
     def custom_script(self, script, args):
         """
@@ -95,7 +90,7 @@ class ScriptMaker(object):
                   'idl_home': self.idl_home, 'command_filename': command_filename}
         return self.env.get_template('startup.sh').render(**params)
 
-    def run(self, script, args=None, save_vars=None, cleanup=True, verbose=True):
+    def run(self, script, args=None, save_vars=None, verbose=True):
         """
         Set up the SSWIDL environment and run the supplied scripts.
 
@@ -107,8 +102,6 @@ class ScriptMaker(object):
             Input arguments to script
         save_vars : list, optional
             Variables to save and return from the IDL namespace
-        cleanup : bool, optional
-            Delete temporary shell and .sav files
         verbose : bool, optional
         """
         args = {} if args is None else args
@@ -131,22 +124,12 @@ class ScriptMaker(object):
             subprocess.call(['chmod', 'u+x', shell_filename])
             cmd_output = subprocess.run([shell_filename], shell=True, stderr=subprocess.PIPE,
                                         stdout=subprocess.PIPE)
-            # Optionally keep command and shell scripts for debugging
-            if not cleanup:
-                with open(os.path.join(defaults['hissw_home'], os.path.basename(procedure_filename)), 'w') as f:
-                    f.write(self.procedure_script(idl_script, save_vars, save_filename))
-                with open(os.path.join(defaults['hissw_home'], os.path.basename(command_filename)), 'w') as f:
-                    f.write(self.command_script(procedure_filename))
-                with open(os.path.join(defaults['hissw_home'], os.path.basename(shell_filename)), 'w') as f:
-                    f.write(self.shell_script(command_filename,))
-            # Raise a useful exception
-            self.check_for_errors(cmd_output, verbose)
-            # Get results from save file
+            self._check_for_errors(cmd_output, verbose)
             results = readsav(save_filename)
 
         return results
 
-    def check_for_errors(self, output, verbose):
+    def _check_for_errors(self, output, verbose):
         """
         Check IDL output to try and decide if an error has occurred
         """
