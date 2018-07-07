@@ -6,6 +6,8 @@ import pytest
 import hissw
 from hissw.util import SSWIDLError
 
+run_kwargs = {'verbose': True, 'cleanup': True}
+
 
 @pytest.fixture
 def hissw_env_blank():
@@ -16,10 +18,8 @@ def test_exception(hissw_env_blank):
     """
     Test exception catching
     """
-    script = '''foobar'''
     with pytest.raises(SSWIDLError):
-        results = hissw_env_blank.run(script, verbose=True, cleanup=True)
-    #assert results['array'].shape == (5, 5)
+        results = hissw_env_blank.run('foobar', **run_kwargs)
 
 
 def test_no_args_no_ssw(hissw_env_blank):
@@ -32,7 +32,7 @@ def test_no_args_no_ssw(hissw_env_blank):
     j = REBIN(TRANSPOSE(LINDGEN(n)), n, n)
     array = (i GE j)
     '''
-    results = hissw_env_blank.run(script, verbose=True, cleanup=True)
+    results = hissw_env_blank.run(script, **run_kwargs)
     assert results['array'].shape == (5, 5)
 
 
@@ -47,7 +47,7 @@ def test_no_ssw(hissw_env_blank):
     array = (i GE j)
     '''
     n = 100
-    results = hissw_env_blank.run(script, args={'n': n}, verbose=True, cleanup=True)
+    results = hissw_env_blank.run(script, args={'n': n}, **run_kwargs)
     assert results['array'].shape == (n, n)
 
 
@@ -67,7 +67,7 @@ def test_aia_response_functions():
     '''
     args = {'flags': ['temp', 'dn', 'timedepend_date', 'evenorm']}
     hissw_env = hissw.ScriptMaker(ssw_packages=['sdo/aia'], ssw_paths=['aia'])
-    results = hissw_env.run(script, args=args, verbose=True, cleanup=True)
+    results = hissw_env.run(script, args=args, **run_kwargs)
     assert 'resp94' in results
     assert 'resp131' in results
     assert 'resp171' in results
