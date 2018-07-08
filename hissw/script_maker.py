@@ -140,4 +140,4 @@ class ScriptMaker(object):
         if 'Execution halted' in stderr:
             raise SSWIDLError(stderr)
         if verbose:
-            print(f'{stdout}\n{stderr}')
+            print(f'{stderr}\n{stdout}')
