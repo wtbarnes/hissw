@@ -21,7 +21,7 @@ You can then run the tests to make sure everything is working alright,
 $ pytest
 ```
 
-**Note: hissw relies on executing several shell commands in the background and as a consequence Windows is (likely) not supported.** 
+**Note: hissw relies on executing several shell commands. This has not been tested on Windows.** 
 
 ## Reporting Issues and Contributing
 Open an [issue on GitHub](https://github.com/wtbarnes/hissw/issues) to report a problem. [Pull requests](https://github.com/wtbarnes/hissw/pulls) welcome.
