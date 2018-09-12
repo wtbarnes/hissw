@@ -6,19 +6,18 @@ The [SolarSoftware](http://www.lmsal.com/solarsoft/) (SSW) stack contains nearly
 
 ## Install and Configuration
 
-Install the dependencies with `conda` (preferred) or `pip`,
+hissw has two dependcies,
+
+1. `jinja2` a powerful templating engine
+2. `scipy` standard scientific tools for Python
+
+To install hissw and its dependencies,
 
 ```shell
-$ conda install jinja2 scipy
+$ pip install hissw
 ```
 
-and then install this package from GitHub via `pip`,
-
-```shell
-$ pip install git+git://github.com/wtbarnes/hissw.git
-```
-
-Alternatively, you can download and install the source yourself,
+You can also install the above dependencies with [`conda`](https://www.anaconda.com/download/). Alternatively, you can download and install the source yourself,
 
 ```shell
 $ git clone https://github.com/wtbarnes/hissw.git

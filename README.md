@@ -9,7 +9,13 @@ hissw depends on the following Python packages,
 * [Jinja2](http://jinja.pocoo.org/docs/dev/)
 * [scipy](https://docs.scipy.org/doc/)
 
-The best way to install these is with [conda](https://www.anaconda.com/download/). You'll also need a local install of IDL and the [Solarsoft library](http://www.lmsal.com/solarsoft/). Then, install hissw from GitHub,
+The best way to install these is with [conda](https://www.anaconda.com/download/) or from PyPI, i.e. `pip install <package-name>`. You'll also need a local install of IDL and the [Solarsoft library](http://www.lmsal.com/solarsoft/). To install hissw,
+
+```shell
+$ pip install hissw
+```
+
+which will automatically install the package and its dependencies. Alternatively, you can install hissw from GitHub,
 
 ```shell
 $ git clone https://github.com/wtbarnes/hissw.git
