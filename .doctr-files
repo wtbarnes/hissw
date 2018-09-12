@@ -11,7 +11,7 @@
 ./assets/images/icons/bitbucket.1b09e088.svg
 ./assets/images/icons/github.f0b8504a.svg
 ./assets/images/icons/gitlab.6dd19c00.svg
-./assets/javascripts/application.a59e2a89.js
+./assets/javascripts/application.583bbe55.js
 ./assets/javascripts/lunr/lunr.da.js
 ./assets/javascripts/lunr/lunr.de.js
 ./assets/javascripts/lunr/lunr.du.js
@@ -31,11 +31,9 @@
 ./assets/javascripts/lunr/lunr.tr.js
 ./assets/javascripts/lunr/tinyseg.js
 ./assets/javascripts/modernizr.1aa3b519.js
-./assets/stylesheets/application-palette.6079476c.css
-./assets/stylesheets/application.ba0fd1a6.css
+./assets/stylesheets/application-palette.22915126.css
+./assets/stylesheets/application.451f80e5.css
 ./examples/aia_example/index.html
-./examples/chianti_example/index.html
-./examples/demreg_example/index.html
 ./examples/simple_example/index.html
 ./images/ex1.png
 ./images/ex2.png
@@ -43,3 +41,4 @@
 ./index.html
 ./search/search_index.json
 ./sitemap.xml
+./sitemap.xml.gz

@@ -37,8 +37,8 @@
       
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
-      <link rel="shortcut icon" href="./assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-0.17.5, mkdocs-material-2.9.2">
+      <link rel="shortcut icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-3.0.4">
     
     
       
@@ -46,34 +46,34 @@
       
     
     
-      <link rel="stylesheet" href="./assets/stylesheets/application.ba0fd1a6.css">
+      <link rel="stylesheet" href="assets/stylesheets/application.451f80e5.css">
       
-        <link rel="stylesheet" href="./assets/stylesheets/application-palette.6079476c.css">
+        <link rel="stylesheet" href="assets/stylesheets/application-palette.22915126.css">
       
       
         
         
-        <meta name="theme-color" content="#7e57c2">
+        <meta name="theme-color" content="#fb8c00">
       
     
     
-      <script src="./assets/javascripts/modernizr.1aa3b519.js"></script>
+      <script src="assets/javascripts/modernizr.1aa3b519.js"></script>
     
     
-      <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
       
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
         <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
       
     
-    <link rel="stylesheet" href="./assets/fonts/material-icons.css">
+    <link rel="stylesheet" href="assets/fonts/material-icons.css">
     
     
   </head>
   
     
     
-    <body dir="ltr" data-md-color-primary="deep-purple" data-md-color-accent="deep-purple">
+    <body dir="ltr" data-md-color-primary="orange" data-md-color-accent="yellow">
   
     <svg class="md-svg">
       <defs>
@@ -209,11 +209,11 @@
                   <div class="md-sidebar__inner">
                     <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <span class="md-nav__button md-logo">
+    <a href="https://wtbarnes.github.io/hissw" title="hissw" class="md-nav__button md-logo">
       
         <i class="md-icon">code</i>
       
-    </span>
+    </a>
     hissw
   </label>
   
@@ -348,30 +348,6 @@
   </li>
 
         
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="examples/chianti_example/" title="Continuum Emission with CHIANTI" class="md-nav__link">
-      Continuum Emission with CHIANTI
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="examples/demreg_example/" title="Differential Emission Measure" class="md-nav__link">
-      Differential Emission Measure
-    </a>
-  </li>
-
-        
       </ul>
     </nav>
   </li>
@@ -439,7 +415,7 @@
                 
                 <h1 id="hissw">hiss(w)</h1>
 <p>The <a href="http://www.lmsal.com/solarsoft/">SolarSoftware</a> (SSW) stack contains nearly every piece of software a solar physicist needs. While libraries like <a href="http://www.astropy.org/">Astropy</a>, <a href="http://sunpy.org/">SunPy</a>, and <a href="https://github.com/chianti-atomic/ChiantiPy">ChiantiPy</a> provide Python equivalents to many of these IDL packages, there's still a lot of functionality only available in SSW and not enough hours in the day to rewrite it all in Python.</p>
-<p><strong>hissw</strong> (pronounced hiss <strong>or</strong> hiss-SSW) is a (<em>VERY</em>) lightweight (~1 file) package that allows you to write IDL scripts (either inline or in a separate file) which use your installed SSW packages and return the results to your local Python namespace. hissw uses Jinja2 templates to generate SSW startup scripts and then runs your IDL code in the background. You can also use Jinja syntax to inject arguments from Python into IDL. The results are then saved to a file and then loaded back in using the amazing <a href="https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.io.readsav.html"><code>readsav()</code> function in <code>scipy.io</code></a>.</p>
+<p><strong>hissw</strong> (<em>hiss</em> (like a snake) + SSW) is a (<em>VERY</em>) lightweight (~1 file) Python package that allows you to write IDL scripts (either inline or in a separate file) which use your installed SSW packages and return the results to your local Python namespace. hissw uses Jinja2 templates to generate SSW startup scripts and then runs your IDL code using <code>subprocess</code>, i.e. the shell. You can also use Jinja syntax to inject arguments from Python into IDL. The results are then saved to a file and then loaded back in using the amazing <a href="https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.io.readsav.html"><code>readsav()</code> function in <code>scipy.io</code></a>.</p>
 <h2 id="install-and-configuration">Install and Configuration</h2>
 <p>Install the dependencies with <code>conda</code> (preferred) or <code>pip</code>,</p>
 <div class="codehilite"><pre><span></span>$ conda install jinja2 scipy
@@ -465,17 +441,21 @@ $ python setup.py install
 </pre></div>
 
 
-<p>and then run the tests to make sure everything is working properly</p>
+<p>Note that if you do not create this file, <strong>you will be required to specify it each time you setup a SSW script environment</strong>, using the keywords <code>ssw_home</code> and <code>idl_home</code>.</p>
+<p>If you've downloaded the source, you can run the tests (requires <code>pytest</code> to be installed) to make sure everything is working properly,</p>
 <div class="codehilite"><pre><span></span>$ pytest
 </pre></div>
 
 
 <h2 id="bridging-the-idl-python-gap-the-bad-way">Bridging the IDL-Python Gap the Bad Way...</h2>
+<p>hissw is a hack, albeit a clever one. In general, the methodology employed here (round-tripping everything in memory to disk) is a <em>terrible idea</em>. There's no shared memory between Python and IDL or anything fancy like that. If you're interested in something more complicated (and harder to install), you may want to check out the more official <a href="https://www.harrisgeospatial.com/docs/Python.html">Python-to-IDL bridge</a>.</p>
 <h2 id="words-of-caution">Word(s) of Caution</h2>
 <ul>
+<li>Python-3 only</li>
 <li>Unfortunately, a local install of of IDL <strong>and</strong> SSW is required</li>
-<li>Relies on executing shell commands with the <code>subprocess</code> module. As such, only Unix-like platforms (e.g. Linux, macOS) are supported</li>
-<li>Widgets and plotting will not work</li>
+<li>Relies on executing shell commands with the <code>subprocess</code> module. I've only tested this on Linux and macOS. <strong>Windows users may encounter difficulties.</strong></li>
+<li>Be careful when injecting large pieces of data into your IDL script as this must be written to a file. It may be better to load it at (IDL) runtime.</li>
+<li>Widgets and plotting will (likely) <strong>not</strong> work</li>
 <li>This has <strong>not</strong> been tested extensively against all SSW/IDL functionality. There are likely many cases where hissw will not work. <a href="https://github.com/wtbarnes/hissw/issues">Bug reports</a> and <a href="https://github.com/wtbarnes/hissw/pulls">pull requests</a> welcome!</li>
 </ul>
                 
@@ -546,9 +526,9 @@ $ python setup.py install
       
     </div>
     
-      <script src="./assets/javascripts/application.a59e2a89.js"></script>
+      <script src="assets/javascripts/application.583bbe55.js"></script>
       
-      <script>app.initialize({version:"0.17.5",url:{base:"."}})</script>
+      <script>app.initialize({version:"1.0.4",url:{base:"."}})</script>
       
     
     
