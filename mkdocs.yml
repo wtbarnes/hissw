@@ -14,13 +14,11 @@ pages:
 - Examples:
     - 'Simple Example' : 'examples/simple_example.md'
     - 'AIA Response Functions' : 'examples/aia_example.md'
-    - 'Continuum Emission with CHIANTI' : 'examples/chianti_example.md'
-    - 'Differential Emission Measure' : 'examples/demreg_example.md'
 theme:
   name: 'material'
   palette:
-    primary: 'deep purple'
-    accent: 'deep purple'
+    primary: 'orange'
+    accent: 'yellow'
   logo:
     icon: 'code'
 
