@@ -9,7 +9,7 @@ i = REBIN(LINDGEN(n), n, n)
 j = REBIN(TRANSPOSE(LINDGEN(n)), n, n)
 mask = (i GE j)
 '''
-ssw = hissw.ScriptMaker()
+ssw = hissw.Environment()
 results = ssw.run(script)
 plt.imshow(results['mask'])
 ```

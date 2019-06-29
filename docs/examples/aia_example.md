@@ -37,7 +37,7 @@ inputs = {'flags': flags, 'interp_logt': interp_logt.tolist()}
 
 Now create the SSW script environment and run the script. We need to include the SDO/AIA package ([which you'll need to install with SSW if you haven't already](http://www.lmsal.com/solarsoft/)) so that the appropriate files are added to the IDL path.
 ```python
-ssw = hissw.ScriptMaker(ssw_packages=['sdo/aia'], ssw_paths=['aia'])
+ssw = hissw.Environment(ssw_packages=['sdo/aia'], ssw_paths=['aia'])
 ssw_resp = ssw.run('/path/to/calc_aia_response.pro', args=inputs)
 ```
 
