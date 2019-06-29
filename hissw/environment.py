@@ -6,7 +6,7 @@ import datetime
 import subprocess
 import tempfile
 
-from jinja2 import (Environment,
+from jinja2 import (Environment as Env,
                     FileSystemLoader,
                     PackageLoader)
 from scipy.io import readsav
@@ -15,9 +15,9 @@ from .read_config import defaults
 from .util import SSWIDLError
 
 
-class ScriptMaker(object):
+class Environment(object):
     """
-    Build and execute SSW IDL scripts.
+    Environment for running SSW and IDL scripts
 
     Parameters
     ----------
@@ -38,7 +38,7 @@ class ScriptMaker(object):
         self.ssw_packages = ssw_packages if ssw_packages is not None else []
         self.ssw_paths = ssw_paths if ssw_paths is not None else []
         self.extra_paths = extra_paths if extra_paths is not None else []
-        self.env = Environment(loader=PackageLoader('hissw', 'templates'))
+        self.env = Env(loader=PackageLoader('hissw', 'templates'))
         self._setup_home(ssw_home, idl_home,)
 
     def _setup_home(self, ssw_home, idl_home,):
@@ -57,10 +57,10 @@ class ScriptMaker(object):
         Generate custom IDL scripts from templates
         """
         if os.path.isfile(script):
-            env = Environment(loader=FileSystemLoader(os.path.dirname(script)))
+            env = Env(loader=FileSystemLoader(os.path.dirname(script)))
             idl_script = env.get_template(os.path.basename(script)).render(**args)
         else:
-            env = Environment()
+            env = Env()
             idl_script = env.from_string(script).render(**args)
 
         return idl_script
@@ -78,7 +78,8 @@ class ScriptMaker(object):
         """
         Generate parent IDL script
         """
-        params = {'ssw_paths': self.ssw_paths, 'extra_paths': self.extra_paths,
+        params = {'ssw_paths': self.ssw_paths,
+                  'extra_paths': self.extra_paths,
                   'procedure_filename': procedure_filename}
         return self.env.get_template('parent.pro').render(**params)
 
@@ -86,8 +87,10 @@ class ScriptMaker(object):
         """
         Generate shell script for starting up SSWIDL
         """
-        params = {'ssw_home': self.ssw_home, 'ssw_packages': self.ssw_packages,
-                  'idl_home': self.idl_home, 'command_filename': command_filename}
+        params = {'ssw_home': self.ssw_home,
+                  'ssw_packages': self.ssw_packages,
+                  'idl_home': self.idl_home,
+                  'command_filename': command_filename}
         return self.env.get_template('startup.sh').render(**params)
 
     def run(self, script, args=None, save_vars=None, verbose=True):
@@ -107,7 +110,8 @@ class ScriptMaker(object):
         args = {} if args is None else args
         with tempfile.TemporaryDirectory() as tmpdir:
             # Get filenames
-            fn_template = os.path.join(tmpdir, '{name}_'+datetime.datetime.now().strftime('%Y%m%d-%H%M%S')+'.{ext}')
+            fn_template = os.path.join(
+                tmpdir, '{name}_'+datetime.datetime.now().strftime('%Y%m%d-%H%M%S')+'.{ext}')
             save_filename = fn_template.format(name='idl_vars', ext='sav')
             procedure_filename = fn_template.format(name='idl_procedure', ext='pro')
             command_filename = fn_template.format(name='idl_script', ext='pro')
@@ -137,7 +141,7 @@ class ScriptMaker(object):
         stderr = output.stderr.decode('utf-8')
         # NOTE: For some reason, not only errors are output to stderr so we
         # have to check it for certain keywords to see if an error occurred
-        if 'Execution halted' in stderr:
+        if 'execution halted' in stderr.lower():
             raise SSWIDLError(stderr)
         if verbose:
             print(f'{stderr}\n{stdout}')
