@@ -1,7 +1,6 @@
 """
 Module level tests
 """
-import numpy as np
 import pytest
 import hissw
 from hissw.util import SSWIDLError
@@ -11,7 +10,7 @@ run_kwargs = {'verbose': True}
 
 @pytest.fixture
 def hissw_env_blank():
-    return hissw.ScriptMaker()
+    return hissw.Environment()
 
 
 def test_exception(hissw_env_blank):
@@ -19,7 +18,7 @@ def test_exception(hissw_env_blank):
     Test exception catching
     """
     with pytest.raises(SSWIDLError):
-        results = hissw_env_blank.run('foobar', **run_kwargs)
+        _ = hissw_env_blank.run('foobar', **run_kwargs)
 
 
 def test_no_args_no_ssw(hissw_env_blank):
@@ -28,7 +27,7 @@ def test_no_args_no_ssw(hissw_env_blank):
     """
     script = '''
     n = 5
-    i = REBIN(LINDGEN(n), n, n)           
+    i = REBIN(LINDGEN(n), n, n)
     j = REBIN(TRANSPOSE(LINDGEN(n)), n, n)
     array = (i GE j)
     '''
@@ -66,7 +65,7 @@ def test_aia_response_functions():
     resp335 = response.a335.tresp
     '''
     args = {'flags': ['temp', 'dn', 'timedepend_date', 'evenorm']}
-    hissw_env = hissw.ScriptMaker(ssw_packages=['sdo/aia'], ssw_paths=['aia'])
+    hissw_env = hissw.Environment(ssw_packages=['sdo/aia'], ssw_paths=['aia'])
     results = hissw_env.run(script, args=args, **run_kwargs)
     assert 'resp94' in results
     assert 'resp131' in results
