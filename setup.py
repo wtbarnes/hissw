@@ -12,7 +12,7 @@ with open('README.md', 'r') as f:
 setup(
     name='hissw',
     license='MIT',
-    version='1.0',
+    version='1.1',
     description='Seamlessly integrate SSWIDL code into your Python workflow',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -21,7 +21,7 @@ setup(
     url='https://github.com/wtbarnes/hissw',
     package_data={'hissw': ['templates/*']},
     packages=['hissw'],
-    classifieers=[
+    classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intendend Audience :: Scientists',
         'License :: OSI Approved :: MIT License',
