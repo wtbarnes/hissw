@@ -19,8 +19,8 @@ theme:
   palette:
     primary: 'orange'
     accent: 'yellow'
-  logo:
-    icon: 'code'
+  icon:
+    logo: 'fontawesome/solid/code'
 
 # Extensions
 markdown_extensions:
@@ -29,9 +29,9 @@ markdown_extensions:
 # Social/Contact
 extra:
   social:
-    - type: 'globe'
+    - icon: 'fontawesome/solid/globe'
       link: 'https://wtbarnes.github.io/'
-    - type: 'github'
+    - icon: 'fontawesome/brands/github'
       link: 'https://github.com/wtbarnes'
-    - type: 'twitter'
+    - icon: 'fontawesome/brands/twitter'
       link: 'https://twitter.com/wtbarnes_'
