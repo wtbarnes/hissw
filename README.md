@@ -30,6 +30,23 @@ $ pytest
 
 **Note: hissw relies on executing several shell commands. This has not been tested on Windows.** 
 
+## Citing `hissw`
+
+If you use `hissw` in your work, please use the following citation,
+
+```bibtex
+@software{barnes_will_2019_4039915,
+  author       = {Barnes, Will},
+  title        = {hissw},
+  month        = jul,
+  year         = 2019,
+  publisher    = {Zenodo},
+  version      = {v1.1},
+  doi          = {10.5281/zenodo.4039915},
+  url          = {https://doi.org/10.5281/zenodo.4039915}
+}
+```
+
 ## Reporting Issues and Contributing
 
 Open an [issue on GitHub](https://github.com/wtbarnes/hissw/issues) to report a problem. [Pull requests](https://github.com/wtbarnes/hissw/pulls) welcome.
