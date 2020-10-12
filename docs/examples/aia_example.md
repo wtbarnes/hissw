@@ -11,7 +11,7 @@ Next, we need to write the IDL code that will calculate the response functions. 
 ```idl
 response = aia_get_response(/{{ flags | join(',/') }})
 ; Pull needed elements out of structure
-logt = response.logte
+logte = response.logte
 resp94 = response.a94.tresp
 resp131 = response.a131.tresp
 resp171 = response.a171.tresp
@@ -19,7 +19,7 @@ resp193 = response.a193.tresp
 resp211 = response.a211.tresp
 resp335 = response.a335.tresp
 ; Interpolate
-interp_logt = {{ interp_logt }}
+interp_logte = {{ interp_logte }}
 interp_resp94 = interpol(resp94,logte,interp_logte)
 interp_resp131 = interpol(resp131,logte,interp_logte)
 interp_resp171 = interpol(resp171,logte,interp_logte)
@@ -30,9 +30,9 @@ interp_resp335 = interpol(resp335,logte,interp_logte)
 
 One of the best parts of **hissw** is that we can setup all of our input arguments in Python. Note that arrays have to be formatted as lists.
 ```python
-interp_logt = np.linspace(5,8,1000)
-flags = ['temp','dn','timedepend_date','evenorm']
-inputs = {'flags': flags, 'interp_logt': interp_logt.tolist()}
+interp_logte = np.linspace(5, 8, 1000)
+flags = ['temp', 'dn', 'timedepend_date', 'evenorm']
+inputs = {'flags': flags, 'interp_logt': interp_logte.tolist()}
 ```
 
 Now create the SSW script environment and run the script. We need to include the SDO/AIA package ([which you'll need to install with SSW if you haven't already](http://www.lmsal.com/solarsoft/)) so that the appropriate files are added to the IDL path.
