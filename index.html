@@ -1,7 +1,4 @@
 
-
-
-
 <!doctype html>
 <html lang="en" class="no-js">
   <head>
@@ -18,7 +15,7 @@
         <meta name="author" content="Will Barnes">
       
       <link rel="shortcut icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.5.13">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-6.0.2">
     
     
       
@@ -26,19 +23,21 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.077507d7.min.css">
-      
-        <link rel="stylesheet" href="assets/stylesheets/palette.ff0a5ce4.min.css">
-      
+      <link rel="stylesheet" href="assets/stylesheets/main.38780c08.min.css">
       
         
+        <link rel="stylesheet" href="assets/stylesheets/palette.3f72e892.min.css">
         
-        <meta name="theme-color" content="#ffa724">
+          
+          
+          <meta name="theme-color" content="#ffa724">
+        
       
     
     
     
       
+        
         <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
         <style>body,input{font-family:"Roboto",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono",SFMono-Regular,Consolas,Menlo,monospace}</style>
@@ -56,9 +55,11 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="orange" data-md-color-accent="yellow">
-  
     
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="orange" data-md-color-accent="yellow">
+      
+  
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" for="__drawer"></label>
@@ -149,8 +150,6 @@
     
     <div class="md-container" data-md-component="container">
       
-        
-      
       
         
       
@@ -206,7 +205,7 @@
         <span class="md-nav__icon md-icon"></span>
       </label>
     
-    <a href="." title="Getting Started" class="md-nav__link md-nav__link--active">
+    <a href="." class="md-nav__link md-nav__link--active">
       Getting Started
     </a>
     
@@ -278,7 +277,7 @@
 
 
   <li class="md-nav__item">
-    <a href="examples/simple_example/" title="Simple Example" class="md-nav__link">
+    <a href="examples/simple_example/" class="md-nav__link">
       Simple Example
     </a>
   </li>
@@ -290,7 +289,7 @@
 
 
   <li class="md-nav__item">
-    <a href="examples/aia_example/" title="AIA Response Functions" class="md-nav__link">
+    <a href="examples/aia_example/" class="md-nav__link">
       AIA Response Functions
     </a>
   </li>
@@ -362,9 +361,6 @@
                   </a>
                 
                 
-                  
-                
-                
                 <h1 id="hissw">hiss(w)</h1>
 <p>The <a href="http://www.lmsal.com/solarsoft/">SolarSoftware</a> (SSW) stack contains nearly every piece of software a solar physicist needs. While libraries like <a href="http://www.astropy.org/">Astropy</a>, <a href="http://sunpy.org/">SunPy</a>, and <a href="https://github.com/chianti-atomic/ChiantiPy">ChiantiPy</a> provide Python equivalents to many of these IDL packages, there's still a lot of functionality only available in SSW and not enough hours in the day to rewrite it all in Python.</p>
 <p><strong>hissw</strong> (<em>hiss</em> (like a snake) + SSW) is a (<em>VERY</em>) lightweight (~1 file) Python package that allows you to write IDL scripts (either inline or in a separate file) which use your installed SSW packages and return the results to your local Python namespace. hissw uses Jinja2 templates to generate SSW startup scripts and then runs your IDL code using <code>subprocess</code>, i.e. the shell. You can also use Jinja syntax to inject arguments from Python into IDL. The results are then saved to a file and then loaded back in using the amazing <a href="https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.io.readsav.html"><code>readsav()</code> function in <code>scipy.io</code></a>.</p>
@@ -375,29 +371,25 @@
 <li><code>scipy</code> standard scientific tools for Python</li>
 </ol>
 <p>To install hissw and its dependencies,</p>
-<div class="codehilite"><pre><span></span><code>$ pip install hissw
+<div class="shell codehilite"><pre><span></span><code>$ pip install hissw
 </code></pre></div>
 
-
 <p>You can also install the above dependencies with <a href="https://www.anaconda.com/download/"><code>conda</code></a>. Alternatively, you can download and install the source yourself,</p>
-<div class="codehilite"><pre><span></span><code>$ git clone https://github.com/wtbarnes/hissw.git
+<div class="shell codehilite"><pre><span></span><code>$ git clone https://github.com/wtbarnes/hissw.git
 $ <span class="nb">cd</span> hissw
 $ python setup.py install
 </code></pre></div>
 
-
 <p>Lastly, you can set the locations of your IDL and SSW installs in a configuration file located in <code>$HOME/.hissw/hisswrc</code>,</p>
-<div class="codehilite"><pre><span></span><code><span class="k">[hissw]</span>
+<div class="ini codehilite"><pre><span></span><code><span class="k">[hissw]</span>
 <span class="na">ssw_home</span><span class="o">=</span><span class="s">/path/to/ssw/tree</span>
 <span class="na">idl_home</span><span class="o">=</span><span class="s">/path/to/local/idl/install</span>
 </code></pre></div>
 
-
 <p>Note that if you do not create this file, <strong>you will be required to specify it each time you setup a SSW script environment</strong>, using the keywords <code>ssw_home</code> and <code>idl_home</code>.</p>
 <p>If you've downloaded the source, you can run the tests (requires <code>pytest</code> to be installed) to make sure everything is working properly,</p>
-<div class="codehilite"><pre><span></span><code>$ pytest
+<div class="shell codehilite"><pre><span></span><code>$ pytest
 </code></pre></div>
-
 
 <h2 id="bridging-the-idl-python-gap-the-bad-way">Bridging the IDL-Python Gap the Bad Way...</h2>
 <p>hissw is a hack, albeit a clever one. In general, the methodology employed here (round-tripping everything in memory to disk) is a <em>terrible idea</em>. There's no shared memory between Python and IDL or anything fancy like that. If you're interested in something more complicated (and harder to install), you may want to check out the more official <a href="https://www.harrisgeospatial.com/docs/Python.html">Python-to-IDL bridge</a>.</p>
@@ -429,7 +421,7 @@ $ python setup.py install
       <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
         
         
-          <a href="examples/simple_example/" title="Simple Example" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="examples/simple_example/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-footer-nav__title">
               <div class="md-ellipsis">
                 <span class="md-footer-nav__direction">
@@ -493,15 +485,15 @@ $ python setup.py install
       
     </div>
     
-      <script src="assets/javascripts/vendor.2d1db4bd.min.js"></script>
-      <script src="assets/javascripts/bundle.6627ddf3.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents"}</script>
+      <script src="assets/javascripts/vendor.77e55a48.min.js"></script>
+      <script src="assets/javascripts/bundle.9554a270.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}</script>
       
       <script>
         app = initialize({
           base: ".",
           features: [],
           search: Object.assign({
-            worker: "assets/javascripts/worker/search.5eca75d3.min.js"
+            worker: "assets/javascripts/worker/search.4ac00218.min.js"
           }, typeof search !== "undefined" && search)
         })
       </script>

@@ -1,7 +1,4 @@
 
-
-
-
 <!doctype html>
 <html lang="en" class="no-js">
   <head>
@@ -18,7 +15,7 @@
         <meta name="author" content="Will Barnes">
       
       <link rel="shortcut icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.5.13">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-6.0.2">
     
     
       
@@ -26,19 +23,21 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.077507d7.min.css">
-      
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ff0a5ce4.min.css">
-      
+      <link rel="stylesheet" href="../../assets/stylesheets/main.38780c08.min.css">
       
         
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.3f72e892.min.css">
         
-        <meta name="theme-color" content="#ffa724">
+          
+          
+          <meta name="theme-color" content="#ffa724">
+        
       
     
     
     
       
+        
         <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
         <style>body,input{font-family:"Roboto",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono",SFMono-Regular,Consolas,Menlo,monospace}</style>
@@ -56,9 +55,11 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="orange" data-md-color-accent="yellow">
-  
     
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="orange" data-md-color-accent="yellow">
+      
+  
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" for="__drawer"></label>
@@ -144,8 +145,6 @@
     
     <div class="md-container" data-md-component="container">
       
-        
-      
       
         
       
@@ -188,7 +187,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../.." title="Getting Started" class="md-nav__link">
+    <a href="../.." class="md-nav__link">
       Getting Started
     </a>
   </li>
@@ -223,7 +222,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../simple_example/" title="Simple Example" class="md-nav__link">
+    <a href="../simple_example/" class="md-nav__link">
       Simple Example
     </a>
   </li>
@@ -241,7 +240,7 @@
     <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
     
     
-    <a href="./" title="AIA Response Functions" class="md-nav__link md-nav__link--active">
+    <a href="./" class="md-nav__link md-nav__link--active">
       AIA Response Functions
     </a>
     
@@ -270,21 +269,17 @@
                   </a>
                 
                 
-                  
-                
-                
                   <h1>AIA Response Functions</h1>
                 
                 <p>The temperature response functions of the EUV channels of the Atmospheric Imaging Assembly (AIA) are used to understand the temperature of the plasma observed by the different telescopes on the instrument. While these are difficult to calculate, SSW provides a single simple routine to calculate them.</p>
 <p>First, import the needed libraries,</p>
-<div class="codehilite"><pre><span></span><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="python codehilite"><pre><span></span><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">hissw</span>
 </code></pre></div>
 
-
 <p>Next, we need to write the IDL code that will calculate the response functions. Because it is a bit long, we'll put it in a separate file, <code>calc_aia_response.pro</code>. Note the Jinja2 syntax (denoted by the <code>{{}}</code>) we use to inject our Python variables into the script.</p>
-<div class="codehilite"><pre><span></span><code>response <span class="o">=</span> aia_get_response(<span class="o">/</span>{{ flags | join(<span class="s1">&#39;,/&#39;</span>) }})
+<div class="idl codehilite"><pre><span></span><code>response <span class="o">=</span> aia_get_response(<span class="o">/</span>{{ flags | join(<span class="s1">&#39;,/&#39;</span>) }})
 <span class="c1">; Pull needed elements out of structure</span>
 logt <span class="o">=</span> response.logte
 resp94 <span class="o">=</span> response.a94.tresp
@@ -303,22 +298,19 @@ interp_resp211 <span class="o">=</span> <span class="nb">interpol</span>(resp211
 interp_resp335 <span class="o">=</span> <span class="nb">interpol</span>(resp335,logte,interp_logte)
 </code></pre></div>
 
-
 <p>One of the best parts of <strong>hissw</strong> is that we can setup all of our input arguments in Python. Note that arrays have to be formatted as lists.</p>
-<div class="codehilite"><pre><span></span><code><span class="n">interp_logt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="n">interp_logt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
 <span class="n">flags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">,</span><span class="s1">&#39;dn&#39;</span><span class="p">,</span><span class="s1">&#39;timedepend_date&#39;</span><span class="p">,</span><span class="s1">&#39;evenorm&#39;</span><span class="p">]</span>
 <span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="n">flags</span><span class="p">,</span> <span class="s1">&#39;interp_logt&#39;</span><span class="p">:</span> <span class="n">interp_logt</span><span class="o">.</span><span class="n">tolist</span><span class="p">()}</span>
 </code></pre></div>
 
-
 <p>Now create the SSW script environment and run the script. We need to include the SDO/AIA package (<a href="http://www.lmsal.com/solarsoft/">which you'll need to install with SSW if you haven't already</a>) so that the appropriate files are added to the IDL path.</p>
-<div class="codehilite"><pre><span></span><code><span class="n">ssw</span> <span class="o">=</span> <span class="n">hissw</span><span class="o">.</span><span class="n">Environment</span><span class="p">(</span><span class="n">ssw_packages</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sdo/aia&#39;</span><span class="p">],</span> <span class="n">ssw_paths</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;aia&#39;</span><span class="p">])</span>
+<div class="python codehilite"><pre><span></span><code><span class="n">ssw</span> <span class="o">=</span> <span class="n">hissw</span><span class="o">.</span><span class="n">Environment</span><span class="p">(</span><span class="n">ssw_packages</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sdo/aia&#39;</span><span class="p">],</span> <span class="n">ssw_paths</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;aia&#39;</span><span class="p">])</span>
 <span class="n">ssw_resp</span> <span class="o">=</span> <span class="n">ssw</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;/path/to/calc_aia_response.pro&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">inputs</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>Finally, plot the response functions for all 6 EUV channels, showing the original (dots) and interpolated (line) values,</p>
-<div class="codehilite"><pre><span></span><code><span class="n">t</span> <span class="o">=</span> <span class="mf">10.</span><span class="o">**</span><span class="n">ssw_resp</span><span class="p">[</span><span class="s1">&#39;logte&#39;</span><span class="p">]</span>
+<div class="python codehilite"><pre><span></span><code><span class="n">t</span> <span class="o">=</span> <span class="mf">10.</span><span class="o">**</span><span class="n">ssw_resp</span><span class="p">[</span><span class="s1">&#39;logte&#39;</span><span class="p">]</span>
 <span class="n">interp_t</span> <span class="o">=</span> <span class="mf">10.</span><span class="o">**</span><span class="n">interp_logte</span>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">channel</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="mi">94</span><span class="p">,</span><span class="mi">131</span><span class="p">,</span><span class="mi">171</span><span class="p">,</span><span class="mi">193</span><span class="p">,</span><span class="mi">211</span><span class="p">,</span><span class="mi">335</span><span class="p">]):</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">ssw_resp</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;resp</span><span class="si">{</span><span class="n">channel</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">],</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;C</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">markevery</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
@@ -331,7 +323,6 @@ interp_resp335 <span class="o">=</span> <span class="nb">interpol</span>(resp335
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div>
-
 
 <p><img alt="AIA Response Functions" src="../../images/exAIA.png" /></p>
                 
@@ -352,7 +343,7 @@ interp_resp335 <span class="o">=</span> <span class="nb">interpol</span>(resp335
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
         
-          <a href="../simple_example/" title="Simple Example" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../simple_example/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-footer-nav__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
             </div>
@@ -417,15 +408,15 @@ interp_resp335 <span class="o">=</span> <span class="nb">interpol</span>(resp335
       
     </div>
     
-      <script src="../../assets/javascripts/vendor.2d1db4bd.min.js"></script>
-      <script src="../../assets/javascripts/bundle.6627ddf3.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents"}</script>
+      <script src="../../assets/javascripts/vendor.77e55a48.min.js"></script>
+      <script src="../../assets/javascripts/bundle.9554a270.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}</script>
       
       <script>
         app = initialize({
           base: "../..",
           features: [],
           search: Object.assign({
-            worker: "../../assets/javascripts/worker/search.5eca75d3.min.js"
+            worker: "../../assets/javascripts/worker/search.4ac00218.min.js"
           }, typeof search !== "undefined" && search)
         })
       </script>
