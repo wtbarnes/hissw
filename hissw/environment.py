@@ -12,7 +12,7 @@ from jinja2 import (Environment as Env,
 from scipy.io import readsav
 
 from .read_config import defaults
-from .util import SSWIDLError
+from .util import SSWIDLError, IDLLicenseError
 
 
 class Environment(object):
@@ -143,5 +143,7 @@ class Environment(object):
         # have to check it for certain keywords to see if an error occurred
         if 'execution halted' in stderr.lower():
             raise SSWIDLError(stderr)
+        if 'failed to acquire license' in stderr.lower():
+            raise IDLLicenseError(stderr)
         if verbose:
             print(f'{stderr}\n{stdout}')
