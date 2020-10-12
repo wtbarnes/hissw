@@ -281,7 +281,7 @@
 <p>Next, we need to write the IDL code that will calculate the response functions. Because it is a bit long, we'll put it in a separate file, <code>calc_aia_response.pro</code>. Note the Jinja2 syntax (denoted by the <code>{{}}</code>) we use to inject our Python variables into the script.</p>
 <div class="idl codehilite"><pre><span></span><code>response <span class="o">=</span> aia_get_response(<span class="o">/</span>{{ flags | join(<span class="s1">&#39;,/&#39;</span>) }})
 <span class="c1">; Pull needed elements out of structure</span>
-logt <span class="o">=</span> response.logte
+logte <span class="o">=</span> response.logte
 resp94 <span class="o">=</span> response.a94.tresp
 resp131 <span class="o">=</span> response.a131.tresp
 resp171 <span class="o">=</span> response.a171.tresp
@@ -289,7 +289,7 @@ resp193 <span class="o">=</span> response.a193.tresp
 resp211 <span class="o">=</span> response.a211.tresp
 resp335 <span class="o">=</span> response.a335.tresp
 <span class="c1">; Interpolate</span>
-interp_logt <span class="o">=</span> {{ interp_logt }}
+interp_logte <span class="o">=</span> {{ interp_logte }}
 interp_resp94 <span class="o">=</span> <span class="nb">interpol</span>(resp94,logte,interp_logte)
 interp_resp131 <span class="o">=</span> <span class="nb">interpol</span>(resp131,logte,interp_logte)
 interp_resp171 <span class="o">=</span> <span class="nb">interpol</span>(resp171,logte,interp_logte)
@@ -299,9 +299,9 @@ interp_resp335 <span class="o">=</span> <span class="nb">interpol</span>(resp335
 </code></pre></div>
 
 <p>One of the best parts of <strong>hissw</strong> is that we can setup all of our input arguments in Python. Note that arrays have to be formatted as lists.</p>
-<div class="python codehilite"><pre><span></span><code><span class="n">interp_logt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
-<span class="n">flags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">,</span><span class="s1">&#39;dn&#39;</span><span class="p">,</span><span class="s1">&#39;timedepend_date&#39;</span><span class="p">,</span><span class="s1">&#39;evenorm&#39;</span><span class="p">]</span>
-<span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="n">flags</span><span class="p">,</span> <span class="s1">&#39;interp_logt&#39;</span><span class="p">:</span> <span class="n">interp_logt</span><span class="o">.</span><span class="n">tolist</span><span class="p">()}</span>
+<div class="python codehilite"><pre><span></span><code><span class="n">interp_logte</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">flags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">,</span> <span class="s1">&#39;dn&#39;</span><span class="p">,</span> <span class="s1">&#39;timedepend_date&#39;</span><span class="p">,</span> <span class="s1">&#39;evenorm&#39;</span><span class="p">]</span>
+<span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="n">flags</span><span class="p">,</span> <span class="s1">&#39;interp_logt&#39;</span><span class="p">:</span> <span class="n">interp_logte</span><span class="o">.</span><span class="n">tolist</span><span class="p">()}</span>
 </code></pre></div>
 
 <p>Now create the SSW script environment and run the script. We need to include the SDO/AIA package (<a href="http://www.lmsal.com/solarsoft/">which you'll need to install with SSW if you haven't already</a>) so that the appropriate files are added to the IDL path.</p>
