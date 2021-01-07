@@ -32,7 +32,7 @@ One of the best parts of **hissw** is that we can setup all of our input argumen
 ```python
 interp_logte = np.linspace(5, 8, 1000)
 flags = ['temp', 'dn', 'timedepend_date', 'evenorm']
-inputs = {'flags': flags, 'interp_logt': interp_logte.tolist()}
+inputs = {'flags': flags, 'interp_logte': interp_logte.tolist()}
 ```
 
 Now create the SSW script environment and run the script. We need to include the SDO/AIA package ([which you'll need to install with SSW if you haven't already](http://www.lmsal.com/solarsoft/)) so that the appropriate files are added to the IDL path.
