@@ -1,8 +1,9 @@
 # :snake: :sunny: hiss(w)
 
-[![Build Status](https://travis-ci.org/wtbarnes/hissw.svg?branch=master)](https://travis-ci.org/wtbarnes/hissw)
+[![GHA](https://github.com/wtbarnes/hissw/workflows/Deploy%20Docs/badge.svg)](https://github.com/wtbarnes/hissw/actions)
 [![PyPI](https://img.shields.io/pypi/v/hissw.svg)](https://pypi.python.org/pypi)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4039915.svg)](https://doi.org/10.5281/zenodo.4039915)
+
 
 Include those pesky SSWIDL scripts in your Python workflow. See the [docs](https://wtbarnes.github.io/hissw/) for more info.
 
