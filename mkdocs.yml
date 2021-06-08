@@ -24,7 +24,8 @@ theme:
 
 # Extensions
 markdown_extensions:
-  - codehilite
+  - pymdownx.highlight
+  - pymdownx.superfences
 
 # Social/Contact
 extra:

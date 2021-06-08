@@ -6,7 +6,7 @@ The [SolarSoftware](http://www.lmsal.com/solarsoft/) (SSW) stack contains nearly
 
 ## Install and Configuration
 
-hissw has two dependcies,
+hissw has two dependencies,
 
 1. `jinja2` a powerful templating engine
 2. `scipy` standard scientific tools for Python
