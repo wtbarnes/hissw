@@ -1,6 +1,6 @@
 # hiss(w)
 
-The [SolarSoftware](http://www.lmsal.com/solarsoft/) (SSW) stack contains nearly every piece of software a solar physicist needs. While libraries like [Astropy](http://www.astropy.org/), [SunPy](http://sunpy.org/), and [ChiantiPy](https://github.com/chianti-atomic/ChiantiPy) provide Python equivalents to many of these IDL packages, there's still a lot of functionality only available in SSW and not enough hours in the day to rewrite it all in Python.
+The [SolarSoftware](http://www.lmsal.com/solarsoft/) (SSW) stack contains nearly every piece of software a solar physicist needs. While libraries like [Astropy](http://www.astropy.org/), [SunPy](http://sunpy.org/), and [ChiantiPy](https://github.com/chianti-atomic/ChiantiPy) provide Python equivalents to many of these IDL packages, there's still a lot of functionality only available in SSW.
 
 **hissw** (*hiss* (like a snake) + SSW) is a (*VERY*) lightweight (~1 file) Python package that allows you to write IDL scripts (either inline or in a separate file) which use your installed SSW packages and return the results to your local Python namespace. hissw uses Jinja2 templates to generate SSW startup scripts and then runs your IDL code using `subprocess`, i.e. the shell. You can also use Jinja syntax to inject arguments from Python into IDL. The results are then saved to a file and then loaded back in using the amazing [`readsav()` function in `scipy.io`](https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.io.readsav.html).
 
@@ -48,7 +48,7 @@ hissw is a hack, albeit a clever one. In general, the methodology employed here 
 ## Word(s) of Caution
 
 * Python-3 only
-* Unfortunately, a local install of of IDL **and** SSW is required
+* A local install of of IDL **and** SSW is required
 * Relies on executing shell commands with the `subprocess` module. I've only tested this on Linux and macOS. **Windows users may encounter difficulties.**
 * Be careful when injecting large pieces of data into your IDL script as this must be written to a file. It may be better to load it at (IDL) runtime.
 * Widgets and plotting will (likely) **not** work
