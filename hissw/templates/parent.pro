@@ -3,7 +3,7 @@
 ssw_path,/{{ ssw_paths | join(', /') }}
 {% endif %}
 ;add any other paths we need to the IDL path
-!PATH=!PATH{%for p in extra_paths%}+':'+EXPAND_PATH('{{ p }}'){%endfor%}
+!PATH={%for p in extra_paths%}EXPAND_PATH('{{ p }}')+':'+{%endfor%}!PATH
 ;run user scripts
 .run {{ procedure_filename }}
 hissw_procedure

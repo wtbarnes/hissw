@@ -26,7 +26,9 @@ class Environment(object):
     ssw_paths : list, optional
         List of SSW paths to pass to `ssw_path`
     extra_paths : list, optional
-        Additional paths to add to the IDL namespace
+        Additional paths to add to the IDL namespace. Note that these
+        are appended to the front of the path such that they take
+        precedence over the existing path.
     ssw_home : str, optional
         Root of SSW tree
     idl_home : str, optional
@@ -106,6 +108,8 @@ class Environment(object):
         save_vars : list, optional
             Variables to save and return from the IDL namespace
         verbose : bool, optional
+            If True, print STDERR and SDOUT. Otherwise it will be
+            suppressed. This is useful for debugging.
         """
         args = {} if args is None else args
         with tempfile.TemporaryDirectory() as tmpdir:
