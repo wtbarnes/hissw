@@ -12,7 +12,7 @@ with open('README.md', 'r') as f:
 setup(
     name='hissw',
     license='MIT',
-    version='1.1',
+    version='1.2',
     description='Seamlessly integrate SSWIDL code into your Python workflow',
     long_description=long_description,
     long_description_content_type='text/markdown',
