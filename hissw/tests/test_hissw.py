@@ -3,6 +3,8 @@ Module level tests
 """
 import pytest
 import hissw
+import numpy as np
+import astropy.units as u
 from hissw.util import SSWIDLError
 
 run_kwargs = {'verbose': True}
@@ -79,3 +81,19 @@ def test_aia_response_functions():
     assert results['resp193'].shape == results['logt'].shape
     assert results['resp211'].shape == results['logt'].shape
     assert results['resp335'].shape == results['logt'].shape
+
+
+def test_units_filter(hissw_env_blank):
+    script = """
+    foo = {{ foo | to_unit('K') }}
+    """
+    res = hissw_env_blank.run(script, args={'foo': 1*u.MK})
+    assert np.allclose(res['foo'], 1e6)
+
+
+def test_units_filter_array(hissw_env_blank):
+    script = """
+    foo = {{ foo | to_unit('K') | list }}
+    """
+    res = hissw_env_blank.run(script, args={'foo': [1, 2]*u.MK})
+    assert np.allclose(res['foo'], [1e6, 2e6])
