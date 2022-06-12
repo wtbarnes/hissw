@@ -13,6 +13,7 @@ from scipy.io import readsav
 
 from .read_config import defaults
 from .util import SSWIDLError, IDLLicenseError
+from .filters import *
 
 
 class Environment(object):
@@ -36,11 +37,16 @@ class Environment(object):
     """
 
     def __init__(self, ssw_packages=None, ssw_paths=None, extra_paths=None,
-                 ssw_home=None, idl_home=None,):
+                 ssw_home=None, idl_home=None, filters=None):
         self.ssw_packages = ssw_packages if ssw_packages is not None else []
         self.ssw_paths = ssw_paths if ssw_paths is not None else []
         self.extra_paths = extra_paths if extra_paths is not None else []
         self.env = Env(loader=PackageLoader('hissw', 'templates'))
+        self.env.filters['to_unit'] = units_filter
+        self.env.filters['log10'] = log10_filter
+        if filters is not None:
+            for k, v in filters.items():
+                self.env.filters[k] = v 
         self._setup_home(ssw_home, idl_home,)
 
     def _setup_home(self, ssw_home, idl_home,):
@@ -59,11 +65,17 @@ class Environment(object):
         Generate custom IDL scripts from templates
         """
         if os.path.isfile(script):
+            # FIXME: there must be a less clumsy way of doing this than 
+            # rebuilding the whole Jinja environment
             env = Env(loader=FileSystemLoader(os.path.dirname(script)))
+            for k, v in self.env.filters:
+                if k not in env.filters:  # skip builtins
+                    env.filters[k] = v
             idl_script = env.get_template(os.path.basename(script)).render(**args)
+        elif isinstance(script, str):
+            idl_script = self.env.from_string(script).render(**args)
         else:
-            env = Env()
-            idl_script = env.from_string(script).render(**args)
+            raise ValueError('Input script must either be a string or path to a script.')
 
         return idl_script
 
