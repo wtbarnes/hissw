@@ -124,6 +124,8 @@ class Environment(object):
             suppressed. This is useful for debugging.
         """
         args = {} if args is None else args
+        # Expose the ssw_home variable in all scripts by default
+        args.update({'ssw_home': self.ssw_home})
         with tempfile.TemporaryDirectory() as tmpdir:
             # Get filenames
             fn_template = os.path.join(
