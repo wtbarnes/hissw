@@ -9,11 +9,12 @@ repo_name: wtbarnes/hissw
 repo_url: https://github.com/wtbarnes/hissw
 
 # Navigation
-pages:
+nav:
 - Getting Started: index.md
 - Examples:
     - 'Simple Example' : 'examples/simple_example.md'
     - 'AIA Response Functions' : 'examples/aia_example.md'
+
 theme:
   name: 'material'
   palette:

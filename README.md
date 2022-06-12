@@ -5,7 +5,8 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4039915.svg)](https://doi.org/10.5281/zenodo.4039915)
 
 
-Easily integrate SSWIDL into your Python workflows. See the [docs](https://wtbarnes.github.io/hissw/) for more info.
+Easily integrate SSWIDL into your Python workflows.
+See the [docs](https://wtbarnes.github.io/hissw/) for more info.
 
 ## Install
 
@@ -15,13 +16,16 @@ To install hissw,
 $ pip install hissw
 ```
 
-which will automatically install the package and its dependencies. hissw depends on the [Jinja2](http://jinja.pocoo.org/docs/dev/) and [scipy](https://docs.scipy.org/doc/) libraries. You can also install these manually with [conda](https://www.anaconda.com/download/) or from PyPI, i.e. `pip install <package-name>`. Additionally, you'll need a local install of IDL and the [Solarsoft library](http://www.lmsal.com/solarsoft/).
+which will automatically install the package and its dependencies.
+hissw depends on the [Jinja2](http://jinja.pocoo.org/docs/dev/) and [scipy](https://docs.scipy.org/doc/) libraries. 
+You can also install these manually with [conda](https://www.anaconda.com/download/) or from PyPI, i.e. `pip install <package-name>`.
+Additionally, you'll need a local install of IDL and the [Solarsoft library](http://www.lmsal.com/solarsoft/).
 
 Alternatively, you can install hissw from GitHub,
 
 ```shell
 $ git clone https://github.com/wtbarnes/hissw.git
-$ cd hissw && python setup.py install
+$ cd hissw && python -m pip install -e[all,test]
 ```
 
 and then run the tests to make sure everything is working alright,

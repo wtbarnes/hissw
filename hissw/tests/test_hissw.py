@@ -97,3 +97,11 @@ def test_units_filter_array(hissw_env_blank):
     """
     res = hissw_env_blank.run(script, args={'foo': [1, 2]*u.MK})
     assert np.allclose(res['foo'], [1e6, 2e6])
+
+
+def test_default_ssw_var(hissw_env_blank):
+    script = """
+    foo = '{{ ssw_home }}'
+    """
+    res = hissw_env_blank.run(script)
+    assert res['foo'].decode('utf-8') == hissw_env_blank.ssw_home
