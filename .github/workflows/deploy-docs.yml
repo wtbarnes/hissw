@@ -15,6 +15,8 @@ jobs:
       - name: Install
         run: |
           pip install .[docs]
+      - name: Build Docs
+        run: |
           mkdocs build -d site
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@4.1.4
