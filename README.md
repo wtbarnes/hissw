@@ -28,9 +28,10 @@ $ git clone https://github.com/wtbarnes/hissw.git
 $ cd hissw && python -m pip install -e[all,test]
 ```
 
-and then run the tests to make sure everything is working alright,
-```
-$ pytest
+and then run the tests to make sure everything is working alright. Note that you must specify paths to SSW and IDL appropriately.
+
+```shell
+$ pytest --ssw-home=<path to top of SSW tree> --idl-home=<path to top level dir of IDL install>
 ```
 
 **Note: hissw relies on executing several shell commands. This has not been tested on Windows.** 
@@ -54,4 +55,5 @@ If you use `hissw` in your work, please use the following citation,
 
 ## Reporting Issues and Contributing
 
-Open an [issue on GitHub](https://github.com/wtbarnes/hissw/issues) to report a problem. [Pull requests](https://github.com/wtbarnes/hissw/pulls) welcome.
+Open an [issue on GitHub](https://github.com/wtbarnes/hissw/issues) to report a problem.
+[Pull requests](https://github.com/wtbarnes/hissw/pulls) welcome.

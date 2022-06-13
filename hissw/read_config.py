@@ -3,13 +3,8 @@ Read some default options if possible
 """
 
 import os
+import configparser
 
-try:
-    # Python 3
-    import configparser
-except ImportError:
-    # Python 2
-    import ConfigParser as configparser
 
 defaults = {}
 defaults['hissw_home'] = os.path.join(os.environ['HOME'], '.hissw')

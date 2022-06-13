@@ -37,7 +37,7 @@ class Environment(object):
     """
 
     def __init__(self, ssw_packages=None, ssw_paths=None, extra_paths=None,
-                 ssw_home=None, idl_home=None, filters=None):
+                 ssw_home=None, idl_home=None, filters=None, idl_only=False):
         self.ssw_packages = ssw_packages if ssw_packages is not None else []
         self.ssw_paths = ssw_paths if ssw_paths is not None else []
         self.extra_paths = extra_paths if extra_paths is not None else []
@@ -47,18 +47,31 @@ class Environment(object):
         if filters is not None:
             for k, v in filters.items():
                 self.env.filters[k] = v 
-        self._setup_home(ssw_home, idl_home,)
+        self._setup_home(ssw_home, idl_home, idl_only=idl_only)
 
-    def _setup_home(self, ssw_home, idl_home,):
+    def _setup_home(self, ssw_home, idl_home, idl_only=False):
         """
         Setup SSW and IDL home locations
         """
-        self.ssw_home = defaults['ssw_home'] if ssw_home is None else ssw_home
-        if self.ssw_home is None:
-            raise ValueError('''ssw_home must be set at instantiation or in the hisswrc file.''')
-        self.idl_home = defaults['idl_home'] if idl_home is None else idl_home
+        self.ssw_home = defaults.get('ssw_home') if ssw_home is None else ssw_home
+        if idl_only:
+            self.ssw_home = None
+        else:
+            if self.ssw_home is None:
+                raise ValueError('ssw_home must be set at instantiation or in the hisswrc file.')
+        self.idl_home = defaults.get('idl_home') if idl_home is None else idl_home
         if self.idl_home is None:
-            raise ValueError('''idl_home must be set at instantiation or in the hisswrc file.''')
+            raise ValueError('idl_home must be set at instantiation or in the hisswrc file.')
+
+    @property
+    def executable(self):
+        """
+        Path to executable for running code
+        """
+        if self.ssw_home:
+            return 'sswidl'
+        else:
+            return os.path.join(self.idl_home, 'bin', 'idl')
 
     def custom_script(self, script, args):
         """
@@ -101,7 +114,8 @@ class Environment(object):
         """
         Generate shell script for starting up SSWIDL
         """
-        params = {'ssw_home': self.ssw_home,
+        params = {'executable': self.executable,
+                  'ssw_home': self.ssw_home,
                   'ssw_packages': self.ssw_packages,
                   'idl_home': self.idl_home,
                   'command_filename': command_filename}
