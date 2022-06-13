@@ -11,8 +11,8 @@ run_kwargs = {'verbose': True}
 
 
 @pytest.fixture
-def hissw_env_blank():
-    return hissw.Environment()
+def hissw_env_blank(idl_home, ssw_home):
+    return hissw.Environment(ssw_home=ssw_home, idl_home=idl_home)
 
 
 def test_exception(hissw_env_blank):
@@ -52,7 +52,7 @@ def test_no_ssw(hissw_env_blank):
     assert results['array'].shape == (n, n)
 
 
-def test_aia_response_functions():
+def test_aia_response_functions(idl_home, ssw_home):
     """
     Compute AIA response functions using AIA packages in SSW
     """
@@ -67,7 +67,8 @@ def test_aia_response_functions():
     resp335 = response.a335.tresp
     '''
     args = {'flags': ['temp', 'dn', 'timedepend_date', 'evenorm']}
-    hissw_env = hissw.Environment(ssw_packages=['sdo/aia'], ssw_paths=['aia'])
+    hissw_env = hissw.Environment(idl_home=idl_home, ssw_home=ssw_home,
+                                  ssw_packages=['sdo/aia'], ssw_paths=['aia'])
     results = hissw_env.run(script, args=args, **run_kwargs)
     assert 'resp94' in results
     assert 'resp131' in results
@@ -105,3 +106,9 @@ def test_default_ssw_var(hissw_env_blank):
     """
     res = hissw_env_blank.run(script)
     assert res['foo'].decode('utf-8') == hissw_env_blank.ssw_home
+
+
+def test_idl_only(idl_home):
+    bare_idl = hissw.Environment(idl_home=idl_home, idl_only=True)
+    res = bare_idl.run('a = 1+1')
+    assert res['a'] == 2
