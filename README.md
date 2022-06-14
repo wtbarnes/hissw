@@ -34,22 +34,23 @@ and then run the tests to make sure everything is working alright. Note that you
 $ pytest --ssw-home=<path to top of SSW tree> --idl-home=<path to top level dir of IDL install>
 ```
 
-**Note: hissw relies on executing several shell commands. This has not been tested on Windows.** 
+**Note: hissw relies on executing several shell commands. This has not been tested on Windows.**
 
 ## Citing `hissw`
 
 If you use `hissw` in your work, please use the following citation,
 
 ```bibtex
-@software{barnes_will_2019_4039915,
-  author       = {Barnes, Will},
-  title        = {hissw},
-  month        = jul,
-  year         = 2019,
+@software{will_barnes_2022_6640421,
+  author       = {Will Barnes and
+                  Bin Chen},
+  title        = {wtbarnes/hissw: v2.0},
+  month        = jun,
+  year         = 2022,
   publisher    = {Zenodo},
-  version      = {v1.1},
-  doi          = {10.5281/zenodo.4039915},
-  url          = {https://doi.org/10.5281/zenodo.4039915}
+  version      = {v2.0},
+  doi          = {10.5281/zenodo.6640421},
+  url          = {https://doi.org/10.5281/zenodo.6640421}
 }
 ```
 
