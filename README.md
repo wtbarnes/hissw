@@ -2,7 +2,7 @@
 
 [![GHA](https://github.com/wtbarnes/hissw/workflows/Deploy%20Docs/badge.svg)](https://github.com/wtbarnes/hissw/actions)
 [![PyPI](https://img.shields.io/pypi/v/hissw.svg)](https://pypi.python.org/pypi)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4039915.svg)](https://doi.org/10.5281/zenodo.4039915)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4039915.svg)](https://doi.org/10.5281/zenodo.5519495)
 
 
 Easily integrate SSWIDL into your Python workflows.
