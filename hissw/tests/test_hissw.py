@@ -152,3 +152,18 @@ def test_custom_filters(idl_home):
 def test_invalid_script(idl_env):
     with pytest.raises(ValueError, match='Input script must either be a string or path to a script.'):
         _ = idl_env.run(None)
+
+
+def test_custom_header_footer(idl_home):
+    header = 'foo = {{ a }}'
+    footer = 'bar = {{ a }} + {{ b }}'
+    env_custom = hissw.Environment(idl_home=idl_home, idl_only=True,
+                                   header=header, footer=footer)
+    script = '''
+    print, {{ a }}
+    print, {{ b }}
+    '''
+    args = {'a': 1, 'b': 2}
+    result = env_custom.run(script, args=args)
+    assert result['foo'] == args['a']
+    assert result['bar'] == args['a'] + args['b']

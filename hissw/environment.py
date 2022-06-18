@@ -40,10 +40,17 @@ class Environment(object):
     idl_only : `bool`, optional
         If True, do not do any setup associated with SSW. This is useful
         if your script has no SSW dependence.
+    header_script : `str` or path-like, optional
+        Script to run before script passed to ``run`` method. Can use any
+        of the variables passed to ``run``.
+    footer_script : `str` or path-like, optional
+        Script to run after script passed to ``run`` method. Can use any
+        of the variables passed to ``run``.
     """
 
     def __init__(self, ssw_packages=None, ssw_paths=None, extra_paths=None,
-                 ssw_home=None, idl_home=None, filters=None, idl_only=False):
+                 ssw_home=None, idl_home=None, filters=None, idl_only=False,
+                 header=None, footer=None):
         self.ssw_packages = ssw_packages if ssw_packages is not None else []
         self.ssw_paths = ssw_paths if ssw_paths is not None else []
         self.extra_paths = extra_paths if extra_paths is not None else []
@@ -52,7 +59,9 @@ class Environment(object):
         self.env.filters['log10'] = log10_filter
         if filters is not None:
             for k, v in filters.items():
-                self.env.filters[k] = v 
+                self.env.filters[k] = v
+        self.header = '' if header is None else header
+        self.footer = '' if footer is None else footer
         self._setup_home(ssw_home, idl_home, idl_only=idl_only)
 
     def _setup_home(self, ssw_home, idl_home, idl_only=False):
@@ -79,9 +88,9 @@ class Environment(object):
         else:
             return os.path.join(self.idl_home, 'bin', 'idl')
 
-    def custom_script(self, script, args):
+    def render_script(self, script, args):
         """
-        Generate custom IDL scripts from templates
+        Render custom IDL scripts from templates and input arguments
         """
         if isinstance(script, (str, pathlib.Path)) and os.path.isfile(script):
             with open(script, 'r') as f:
@@ -90,13 +99,25 @@ class Environment(object):
             raise ValueError('Input script must either be a string or path to a script.')
         return self.env.from_string(script).render(**args)
 
+    def custom_script(self, script, args):
+        """
+        Generate the script that will be executed
+        """
+        body = self.render_script(script, args)
+        header = self.render_script(self.header, args)
+        footer = self.render_script(self.footer, args)
+        idl_script = f'{header}\n{body}\n{footer}'
+        return idl_script
+
     def procedure_script(self, script, save_vars, save_filename):
         """
         Render inner procedure file
         """
         if save_vars is None:
             save_vars = []
-        params = {'script': script, 'save_vars': save_vars, 'save_filename': save_filename}
+        params = {'_script': script,
+                  '_save_vars': save_vars,
+                  '_save_filename': save_filename}
         return self.env.get_template('procedure.pro').render(**params)
 
     def command_script(self, procedure_filename):
