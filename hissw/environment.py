@@ -3,6 +3,7 @@ Build SSW scripts from Jinja 2 templates
 """
 import os
 import datetime
+import pathlib
 import subprocess
 import tempfile
 
@@ -82,7 +83,7 @@ class Environment(object):
         """
         Generate custom IDL scripts from templates
         """
-        if os.path.isfile(script):
+        if isinstance(script, (str, pathlib.Path)) and os.path.isfile(script):
             with open(script, 'r') as f:
                 script = f.read()
         if not isinstance(script, str):

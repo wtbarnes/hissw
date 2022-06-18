@@ -132,3 +132,23 @@ def test_script_from_file(idl_env, tmp_path):
     b = 2
     result = idl_env.run(script_file, args={'a':a, 'b': b})
     assert result['foo'] == (a + b)
+
+
+def test_custom_filters(idl_home):
+    filters = {
+        'my_filter': lambda x: 'foo' if x < 0.5 else 'bar'
+    }
+    env = hissw.Environment(idl_home=idl_home, idl_only=True, filters=filters)
+    script = '''
+    a = '{{ a | my_filter }}'
+    b = '{{ b | my_filter }}'
+    '''
+    args = {'a': 0.1, 'b': 0.6}
+    result = env.run(script, args=args)
+    assert result['a'].decode('utf-8') == filters['my_filter'](args['a'])
+    assert result['b'].decode('utf-8') == filters['my_filter'](args['b'])
+
+
+def test_invalid_script(idl_env):
+    with pytest.raises(ValueError, match='Input script must either be a string or path to a script.'):
+        _ = idl_env.run(None)
