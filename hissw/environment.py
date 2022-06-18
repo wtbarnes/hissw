@@ -3,12 +3,11 @@ Build SSW scripts from Jinja 2 templates
 """
 import os
 import datetime
+import pathlib
 import subprocess
 import tempfile
 
-from jinja2 import (Environment as Env,
-                    FileSystemLoader,
-                    PackageLoader)
+import jinja2
 from scipy.io import readsav
 
 from .read_config import defaults
@@ -22,18 +21,25 @@ class Environment(object):
 
     Parameters
     ----------
-    ssw_packages : list, optional
+    ssw_packages : `list`, optional
         List of SSW packages to load, e.g. 'sdo/aia', 'chianti'
-    ssw_paths : list, optional
+    ssw_paths : `list`, optional
         List of SSW paths to pass to `ssw_path`
-    extra_paths : list, optional
+    extra_paths : `list`, optional
         Additional paths to add to the IDL namespace. Note that these
         are appended to the front of the path such that they take
         precedence over the existing path.
-    ssw_home : str, optional
+    ssw_home : `str`, optional
         Root of SSW tree
-    idl_home : str, optional
+    idl_home : `str`, optional
         Path to IDL executable
+    filters : `dict`, optional
+        Filters to use scripts. This should be a dictionary where the key
+        is the name of the filter and the value is the corresponding
+        function.
+    idl_only : `bool`, optional
+        If True, do not do any setup associated with SSW. This is useful
+        if your script has no SSW dependence.
     """
 
     def __init__(self, ssw_packages=None, ssw_paths=None, extra_paths=None,
@@ -41,7 +47,7 @@ class Environment(object):
         self.ssw_packages = ssw_packages if ssw_packages is not None else []
         self.ssw_paths = ssw_paths if ssw_paths is not None else []
         self.extra_paths = extra_paths if extra_paths is not None else []
-        self.env = Env(loader=PackageLoader('hissw', 'templates'))
+        self.env = jinja2.Environment(loader=jinja2.PackageLoader('hissw', 'templates'))
         self.env.filters['to_unit'] = units_filter
         self.env.filters['log10'] = log10_filter
         if filters is not None:
@@ -77,20 +83,12 @@ class Environment(object):
         """
         Generate custom IDL scripts from templates
         """
-        if os.path.isfile(script):
-            # FIXME: there must be a less clumsy way of doing this than 
-            # rebuilding the whole Jinja environment
-            env = Env(loader=FileSystemLoader(os.path.dirname(script)))
-            for k, v in self.env.filters:
-                if k not in env.filters:  # skip builtins
-                    env.filters[k] = v
-            idl_script = env.get_template(os.path.basename(script)).render(**args)
-        elif isinstance(script, str):
-            idl_script = self.env.from_string(script).render(**args)
-        else:
+        if isinstance(script, (str, pathlib.Path)) and os.path.isfile(script):
+            with open(script, 'r') as f:
+                script = f.read()
+        if not isinstance(script, str):
             raise ValueError('Input script must either be a string or path to a script.')
-
-        return idl_script
+        return self.env.from_string(script).render(**args)
 
     def procedure_script(self, script, save_vars, save_filename):
         """
