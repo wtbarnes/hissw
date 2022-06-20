@@ -140,7 +140,7 @@ class Environment(object):
                   'command_filename': command_filename}
         return self.env.get_template('startup.sh').render(**params)
 
-    def run(self, script, args=None, save_vars=None, verbose=True):
+    def run(self, script, args=None, save_vars=None, verbose=True, **kwargs):
         """
         Set up the SSWIDL environment and run the supplied scripts.
 
@@ -179,12 +179,12 @@ class Environment(object):
             subprocess.call(['chmod', 'u+x', shell_filename])
             cmd_output = subprocess.run([shell_filename], shell=True, stderr=subprocess.PIPE,
                                         stdout=subprocess.PIPE)
-            self._check_for_errors(cmd_output, verbose)
+            self._check_for_errors(cmd_output, verbose, **kwargs)
             results = readsav(save_filename)
 
         return results
 
-    def _check_for_errors(self, output, verbose):
+    def _check_for_errors(self, output, verbose, **kwargs):
         """
         Check IDL output to try and decide if an error has occurred
         """
@@ -192,9 +192,10 @@ class Environment(object):
         stderr = output.stderr.decode('utf-8')
         # NOTE: For some reason, not only errors are output to stderr so we
         # have to check it for certain keywords to see if an error occurred
-        if 'execution halted' in stderr.lower():
-            raise SSWIDLError(stderr)
-        if 'failed to acquire license' in stderr.lower():
-            raise IDLLicenseError(stderr)
+        if kwargs.get('raise_exceptions', True):
+            if 'execution halted' in stderr.lower():
+                raise SSWIDLError(stderr)
+            if 'failed to acquire license' in stderr.lower():
+                raise IDLLicenseError(stderr)
         if verbose:
             print(f'{stderr}\n{stdout}')
