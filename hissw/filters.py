@@ -21,3 +21,13 @@ def log10_filter(value):
     Take the base 10 log of a given value.
     """
     return np.log10(value)
+
+
+def string_list_filter(string_list):
+    """
+    Double quote a list of strings.
+    
+    This is needed when passing in a list of strings to IDL as each string
+    in the list will not be quoted when passed into the template.
+    """
+    return [f"'{s}'" for s in string_list]

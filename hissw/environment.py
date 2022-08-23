@@ -9,6 +9,7 @@ import tempfile
 
 import jinja2
 from scipy.io import readsav
+from .filters import string_list_filter
 
 from .read_config import defaults
 from .util import SSWIDLError, IDLLicenseError
@@ -34,7 +35,7 @@ class Environment(object):
     idl_home : `str`, optional
         Path to IDL executable
     filters : `dict`, optional
-        Filters to use scripts. This should be a dictionary where the key
+        Filters to use in scripts. This should be a dictionary where the key
         is the name of the filter and the value is the corresponding
         function.
     idl_only : `bool`, optional
@@ -57,6 +58,7 @@ class Environment(object):
         self.env = jinja2.Environment(loader=jinja2.PackageLoader('hissw', 'templates'))
         self.env.filters['to_unit'] = units_filter
         self.env.filters['log10'] = log10_filter
+        self.env.filters['string_list'] = string_list_filter
         if filters is not None:
             for k, v in filters.items():
                 self.env.filters[k] = v
