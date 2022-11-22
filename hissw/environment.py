@@ -59,6 +59,7 @@ class Environment(object):
         self.env.filters['to_unit'] = units_filter
         self.env.filters['log10'] = log10_filter
         self.env.filters['string_list'] = string_list_filter
+        self.env.filters['force_double_precision'] = force_double_precision_filter
         if filters is not None:
             for k, v in filters.items():
                 self.env.filters[k] = v
