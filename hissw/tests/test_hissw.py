@@ -176,3 +176,42 @@ def test_custom_header_footer(idl_home):
     result = env_custom.run(script, args=args)
     assert result['foo'] == args['a']
     assert result['bar'] == args['a'] + args['b']
+
+
+@pytest.mark.parametrize('var', [
+    1 / 3,
+    float(10),
+    [1/3, 1/7, 0.1],
+    np.random.rand(100),
+    list(np.random.rand(10).astype(np.longdouble))
+])
+def test_force_double_precision_filter(var, idl_env):
+    # This test ensures that floating point precision is conserved when passing
+    # things from Python to IDL. See https://github.com/wtbarnes/hissw/issues/31
+    result = idl_env.run(
+            '''
+            var = {{ var | force_double_precision }}
+            var_size = size(var)
+            ''',
+            args={'var': var})
+    assert u.allclose(var, result['var'], atol=0.0, rtol=0.0)
+    # The result of IDL size has a variable number of entries depending on the
+    # dimensionality of the input array
+    # NOTE: 5 corresponds to double-precision floating point. See
+    # https://www.l3harrisgeospatial.com/docs/make_array.html#TYPE
+    assert result['var_size'][len(result['var'].shape) + 1] == 5
+
+
+@pytest.mark.parametrize('var', [
+    1 / 3 * u.s,
+    float(10) * u.s,
+    [1/3, 1/7, 0.1] * u.s,
+    np.random.rand(100) * u.minute,
+])
+def test_force_double_precision_filter_with_quantity(var, idl_env):
+    # This test ensures that floating point precision is conserved when passing
+    # things from Python to IDL. See https://github.com/wtbarnes/hissw/issues/31
+    result = idl_env.run('var = {{ var | to_unit("h") | force_double_precision }}',
+                         args={'var': var})
+    assert u.allclose(var.to_value('h'), result['var'], atol=0.0, rtol=0.0)
+
