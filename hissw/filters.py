@@ -47,7 +47,8 @@ def force_double_precision_filter(value):
     Thus, to preserve precision, this filter uses the `as_integer_ratio` method
     to represent floating point values as division operations between integer values
     to ensure that precision is preserved when passing floating point values from
-    IDL into Python.
+    IDL into Python. When used in combination with other filters, this filter should
+    be used last as it forces a conversion to a list of strings.
     """
     if isinstance(value, (np.ndarray, list)):
         str_list = [force_double_precision_filter(x) for x in value]

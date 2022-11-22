@@ -43,7 +43,7 @@ $ pytest
 
 ## Bridging the IDL-Python Gap the Bad Way...
 
-hissw is a hack, albeit a clever one. In general, the methodology employed here (round-tripping everything in memory to disk) is a *terrible idea*. There's no shared memory between Python and IDL or anything fancy like that. If you're interested in something more complicated (and harder to install), you may want to check out the more official [Python-to-IDL bridge](https://www.harrisgeospatial.com/docs/Python.html).
+`hissw` is a hack, albeit a clever one. In general, the methodology employed here (round-tripping everything in memory to disk) is a *terrible idea*. There's no shared memory between Python and IDL or anything fancy like that. If you're interested in something more complicated (and harder to install), you may want to check out the more official [Python-to-IDL bridge](https://www.harrisgeospatial.com/docs/Python.html).
 
 ## Word(s) of Caution
 
@@ -54,3 +54,18 @@ hissw is a hack, albeit a clever one. In general, the methodology employed here 
 * Widgets and plotting will (likely) **not** work
 * This has **not** been tested extensively against all SSW/IDL functionality. There are likely many cases where hissw will not work. [Bug reports](https://github.com/wtbarnes/hissw/issues) and [pull requests](https://github.com/wtbarnes/hissw/pulls) welcome!
 
+## A Note on Preserving Precision between Python and IDL
+
+`hissw` relies on string representations of Python objects when inserting values into the resulting IDL script.
+However, [the default string representation of Python floats is truncated well below the actual floating point precision.](https://docs.python.org/3/tutorial/floatingpoint.html#floating-point-arithmetic-issues-and-limitations)
+This can result in a loss of precision when injecting floating point values into IDL from Python as documented in [this issue](https://github.com/wtbarnes/hissw/issues/31).
+Thus, to ensure that floating point values are accurately represented, hissw provides the `force_double_precision` filter.
+This filter can be used as follows, where `var` is a (scalar or array) variable containing a floating point value,
+
+```IDL
+var = {{ var | force_double_precision }}
+```
+
+This filter uses the builtin [`float.as_integer_ratio`](https://docs.python.org/3/library/stdtypes.html#float.as_integer_ratio) method to represent floating point values as division operations between integer values
+to ensure that precision is not lost in the string representation Python values in the resulting IDL script.
+If used in combination with other filters, this filter should be used last.
