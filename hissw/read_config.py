@@ -2,9 +2,8 @@
 Read some default options if possible
 """
 
-import os
 import configparser
-
+import os
 
 defaults = {}
 defaults['hissw_home'] = os.path.join(os.environ['HOME'], '.hissw')
