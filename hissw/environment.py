@@ -1,22 +1,23 @@
 """
 Build SSW scripts from Jinja 2 templates
 """
-import os
 import datetime
+import os
 import pathlib
+import stat
 import subprocess
 import tempfile
 
 import jinja2
 from scipy.io import readsav
-from .filters import string_list_filter
 
-from .read_config import defaults
-from .util import SSWIDLError, IDLLicenseError
-from .filters import *
+from hissw.filters import (force_double_precision_filter, log10_filter,
+                           string_list_filter, units_filter)
+from hissw.read_config import defaults
+from hissw.util import IDLLicenseError, SSWIDLError
 
 
-class Environment(object):
+class Environment:
     """
     Environment for running SSW and IDL scripts
 
@@ -52,10 +53,21 @@ class Environment(object):
     def __init__(self, ssw_packages=None, ssw_paths=None, extra_paths=None,
                  ssw_home=None, idl_home=None, filters=None, idl_only=False,
                  header=None, footer=None):
+        # NOTE: Import here to avoid circular imports
+        from hissw import log
+        self.log = log
+        self.idl_only = idl_only
+        self.ssw_home = ssw_home
+        self.idl_home = idl_home
         self.ssw_packages = ssw_packages if ssw_packages is not None else []
         self.ssw_paths = ssw_paths if ssw_paths is not None else []
         self.extra_paths = extra_paths if extra_paths is not None else []
         self.env = jinja2.Environment(loader=jinja2.PackageLoader('hissw', 'templates'))
+        self._setup_filters(filters)
+        self.header = '' if header is None else header
+        self.footer = '' if footer is None else footer
+
+    def _setup_filters(self, filters):
         self.env.filters['to_unit'] = units_filter
         self.env.filters['log10'] = log10_filter
         self.env.filters['string_list'] = string_list_filter
@@ -63,22 +75,30 @@ class Environment(object):
         if filters is not None:
             for k, v in filters.items():
                 self.env.filters[k] = v
-        self.header = '' if header is None else header
-        self.footer = '' if footer is None else footer
-        self._setup_home(ssw_home, idl_home, idl_only=idl_only)
 
-    def _setup_home(self, ssw_home, idl_home, idl_only=False):
-        """
-        Setup SSW and IDL home locations
-        """
-        self.ssw_home = defaults.get('ssw_home') if ssw_home is None else ssw_home
-        if idl_only:
-            self.ssw_home = None
-        else:
-            if self.ssw_home is None:
+    @property
+    def ssw_home(self):
+        return self._ssw_home
+
+    @ssw_home.setter
+    def ssw_home(self, value):
+        self._ssw_home = defaults.get('ssw_home') if value is None else value
+        try:
+            self._ssw_home = pathlib.Path(self._ssw_home)
+        except TypeError:
+            if not self.idl_only:
                 raise ValueError('ssw_home must be set at instantiation or in the hisswrc file.')
-        self.idl_home = defaults.get('idl_home') if idl_home is None else idl_home
-        if self.idl_home is None:
+
+    @property
+    def idl_home(self):
+        return self._idl_home
+
+    @idl_home.setter
+    def idl_home(self, value):
+        self._idl_home = defaults.get('idl_home') if value is None else value
+        try:
+            self._idl_home = pathlib.Path(self._idl_home)
+        except TypeError:
             raise ValueError('idl_home must be set at instantiation or in the hisswrc file.')
 
     @property
@@ -86,17 +106,17 @@ class Environment(object):
         """
         Path to executable for running code
         """
-        if self.ssw_home:
-            return 'sswidl'
+        if self.idl_only:
+            return self.idl_home / 'bin' / 'idl'
         else:
-            return os.path.join(self.idl_home, 'bin', 'idl')
+            return 'sswidl'
 
     def render_script(self, script, args):
         """
         Render custom IDL scripts from templates and input arguments
         """
-        if isinstance(script, (str, pathlib.Path)) and os.path.isfile(script):
-            with open(script, 'r') as f:
+        if isinstance(script, (str, pathlib.Path)) and pathlib.Path(script).is_file():
+            with open(script) as f:
                 script = f.read()
         if not isinstance(script, str):
             raise ValueError('Input script must either be a string or path to a script.')
@@ -116,8 +136,6 @@ class Environment(object):
         """
         Render inner procedure file
         """
-        if save_vars is None:
-            save_vars = []
         params = {'_script': script,
                   '_save_vars': save_vars,
                   '_save_filename': save_filename}
@@ -143,7 +161,7 @@ class Environment(object):
                   'command_filename': command_filename}
         return self.env.get_template('startup.sh').render(**params)
 
-    def run(self, script, args=None, save_vars=None, verbose=True, **kwargs):
+    def run(self, script, args=None, save_vars=None, raise_exceptions=True):
         """
         Set up the SSWIDL environment and run the supplied scripts.
 
@@ -155,50 +173,59 @@ class Environment(object):
             Input arguments to script
         save_vars : list, optional
             Variables to save and return from the IDL namespace
-        verbose : bool, optional
-            If True, print STDERR and SDOUT. Otherwise it will be
-            suppressed. This is useful for debugging.
+        raise_exceptions : bool, optional
+            If True, raise an exception based on the IDL output. This is left
+            as a flag because not raising an exception is sometimes useful
+            for debugging.
         """
+        save_vars = [] if save_vars is None else save_vars
         args = {} if args is None else args
         # Expose the ssw_home variable in all scripts by default
         args.update({'ssw_home': self.ssw_home})
         with tempfile.TemporaryDirectory() as tmpdir:
+            tmpdir = pathlib.Path(tmpdir)
+            date_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
             # Get filenames
-            fn_template = os.path.join(
-                tmpdir, '{name}_'+datetime.datetime.now().strftime('%Y%m%d-%H%M%S')+'.{ext}')
-            save_filename = fn_template.format(name='idl_vars', ext='sav')
-            procedure_filename = fn_template.format(name='idl_procedure', ext='pro')
-            command_filename = fn_template.format(name='idl_script', ext='pro')
-            shell_filename = fn_template.format(name='ssw_shell', ext='sh')
+            save_filename = tmpdir / f'idl_vars_{date_string}.sav'
+            procedure_filename = tmpdir / f'idl_procedure_{date_string}.pro'
+            command_filename = tmpdir / f'idl_script_{date_string}.pro'
+            shell_filename = tmpdir / f'ssw_shell_{date_string}.sh'
             # Render and save scripts
             idl_script = self.custom_script(script, args)
-            with open(procedure_filename, 'w') as f:
-                f.write(self.procedure_script(idl_script, save_vars, save_filename))
-            with open(command_filename, 'w') as f:
-                f.write(self.command_script(procedure_filename))
-            with open(shell_filename, 'w') as f:
-                f.write(self.shell_script(command_filename,))
+            files = [
+                (procedure_filename, self.procedure_script(idl_script, save_vars, save_filename)),
+                (command_filename, self.command_script(procedure_filename)),
+                (shell_filename, self.shell_script(command_filename)),
+            ]
+            for filename, filescript in files:
+                self.log.debug(f'{filename}:\n{filescript}')
+                with open(filename, 'w') as f:
+                    f.write(filescript)
             # Execute
-            subprocess.call(['chmod', 'u+x', shell_filename])
-            cmd_output = subprocess.run([shell_filename], shell=True, stderr=subprocess.PIPE,
-                                        stdout=subprocess.PIPE)
-            self._check_for_errors(cmd_output, verbose, **kwargs)
+            os.chmod(shell_filename, mode=stat.S_IRWXU)
+            cmd_output = subprocess.run(
+                [shell_filename],
+                shell=True,
+                capture_output=True,
+                text=True,
+            )
+            self._check_for_errors(cmd_output, raise_exceptions=raise_exceptions)
             results = readsav(save_filename)
 
         return results
 
-    def _check_for_errors(self, output, verbose, **kwargs):
+    def _check_for_errors(self, output, raise_exceptions=True):
         """
         Check IDL output to try and decide if an error has occurred
         """
-        stdout = output.stdout.decode('utf-8')
-        stderr = output.stderr.decode('utf-8')
+        stdout = output.stdout
+        stderr = output.stderr
         # NOTE: For some reason, not only errors are output to stderr so we
         # have to check it for certain keywords to see if an error occurred
-        if kwargs.get('raise_exceptions', True):
+        if raise_exceptions:
             if 'execution halted' in stderr.lower():
                 raise SSWIDLError(stderr)
             if 'failed to acquire license' in stderr.lower():
                 raise IDLLicenseError(stderr)
-        if verbose:
-            print(f'{stderr}\n{stdout}')
+        self.log.warning(stderr)
+        self.log.info(stdout)
