@@ -1,0 +1,98 @@
+[build-system]
+requires = [
+    "setuptools",
+    "setuptools_scm",
+    "wheel",
+]
+build-backend = 'setuptools.build_meta'
+
+[project]
+name = "hissw"
+requires-python = ">=3.9"
+dependencies = [
+    "jinja2",
+    "scipy",
+]
+description = "Seamlessly integrate SSWIDL code into your Python workflow"
+readme = {file="README.md", content-type = "text/markdown"}
+authors = [
+    {name="Will Barnes", email="will.t.barnes@gmail.com"},
+    {name="Bin Chen"},
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+]
+keywords = [
+    "solar",
+    "sun",
+    "ssw",
+    "solar-physics",
+    "idl",
+    "sswidl",
+    "solarsoft",
+]
+
+[project.urls]
+Homepage = "https://github.com/wtbarnes/hissw/"
+Documentation = "https://wtbarnes.github.io/hissw/"
+Source = "https://github.com/wtbarnes/hissw/"
+
+[project.optional-dependencies]
+astropy = ["astropy"]
+test = ["pytest", "astropy"]
+docs = ["mkdocs", "mkdocs-material"]
+
+[tool.setuptools.package-data]
+hissw = ["templates/*.pro", "templates/*.sh"]
+
+[tool.codespell]
+skip = "*.fts,*.fits,venv,*.pro,*.asdf,*.sh"
+
+[tool.ruff]
+target-version = "py39"
+line-length = 110
+exclude=[
+    ".git,",
+    "__pycache__",
+    "build",
+    "hissw/version.py",
+]
+show-fixes = true
+show-source = true
+
+select = [
+       "E",
+       "F",
+       "W",
+       "UP",
+       "PT",
+       #"RET",
+       #"TID",
+
+]
+extend-ignore = [
+    # pycodestyle (E, W)
+    "E501",  # LineTooLong                             # TODO! fix
+
+    # pytest (PT)
+    "PT001",  # Always use pytest.fixture()
+    "PT004",  # Fixtures which don't return anything should have leading _
+    "PT007",  # Parametrize should be lists of tuples  # TODO! fix
+    "PT011",  # Too broad exception assert             # TODO! fix
+    "PT023",  # Always use () on pytest decorators
+]
+
+[tool.ruff.per-file-ignores]
+# Part of configuration, not a package.
+"setup.py" = ["INP001"]
+"conftest.py" = ["INP001"]
+
+"__init__.py" = ["E402", "F401", "F403"]
+"test_*.py" = ["B011", "D", "E402", "PGH001", "S101"]
+
+
+[tool.ruff.pydocstyle]
+convention = "numpy"
