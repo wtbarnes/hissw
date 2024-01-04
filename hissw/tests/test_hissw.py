@@ -42,7 +42,7 @@ def test_exception_idl_command(idl_env):
 
 
 def test_exception_missing_ssw(tmp_path):
-    env = hissw.Environment(ssw_home=tmp_path)
+    env = hissw.Environment(idl_home=tmp_path, ssw_home=tmp_path)
     with pytest.raises(SSWNotFoundError):
         _ = env.run('')
 
