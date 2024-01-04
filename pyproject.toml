@@ -8,6 +8,7 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = "hissw"
+dynamic = ["version"]
 requires-python = ">=3.9"
 dependencies = [
     "jinja2",
@@ -45,8 +46,13 @@ astropy = ["astropy"]
 test = ["pytest", "astropy"]
 docs = ["mkdocs", "mkdocs-material"]
 
+[tool.setuptools.packages.find]
+where = ["hissw"]
+
 [tool.setuptools.package-data]
 hissw = ["templates/*.pro", "templates/*.sh"]
+
+[tool.setuptools_scm]
 
 [tool.codespell]
 skip = "*.fts,*.fits,venv,*.pro,*.asdf,*.sh"
