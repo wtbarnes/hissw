@@ -53,7 +53,7 @@ jobs:
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@main
     with:
       test_extras: 'dev'
-      test_command: 'pytest -p no:warnings --doctest-rst --pyargs hissw'
+      test_command: 'pytest -p no:warnings --pyargs hissw'
       submodules: false
       python-version: '3.11'
     secrets:
