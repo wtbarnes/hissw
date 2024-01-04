@@ -14,7 +14,8 @@ from scipy.io import readsav
 from hissw.filters import (force_double_precision_filter, log10_filter,
                            string_list_filter, units_filter)
 from hissw.read_config import defaults
-from hissw.util import IDLLicenseError, SSWIDLError
+from hissw.util import (IDLLicenseError, IDLNotFoundError, SSWIDLError,
+                        SSWNotFoundError)
 
 
 class Environment:
@@ -146,6 +147,7 @@ class Environment:
         Generate parent IDL script
         """
         params = {'ssw_paths': self.ssw_paths,
+                  'use_ssw': not self.idl_only,
                   'extra_paths': self.extra_paths,
                   'procedure_filename': procedure_filename}
         return self.env.get_template('parent.pro').render(**params)
@@ -158,6 +160,7 @@ class Environment:
                   'ssw_home': self.ssw_home,
                   'ssw_packages': self.ssw_packages,
                   'idl_home': self.idl_home,
+                  'use_ssw': not self.idl_only,
                   'command_filename': command_filename}
         return self.env.get_template('startup.sh').render(**params)
 
@@ -227,5 +230,9 @@ class Environment:
                 raise SSWIDLError(stderr)
             if 'failed to acquire license' in stderr.lower():
                 raise IDLLicenseError(stderr)
+            if 'setup.ssw: no such file or directory' in stderr.lower():
+                raise SSWNotFoundError(f'No SSW installation found at {self.ssw_home}.')
+            if 'idl: command not found' in stderr.lower():
+                raise IDLNotFoundError(f'No IDL installation found at {self.idl_home}.')
         self.log.warning(stderr)
         self.log.info(stdout)

@@ -6,28 +6,51 @@ import numpy as np
 import pytest
 
 import hissw
-from hissw.util import SSWIDLError
+from hissw.util import IDLNotFoundError, SSWIDLError, SSWNotFoundError
 
 
 @pytest.fixture
 def idl_env(idl_home):
-    return hissw.Environment(idl_home=idl_home, idl_only=True)
-
+    env = hissw.Environment(idl_home=idl_home, idl_only=True)
+    try:
+        _ = env.run('')
+    except IDLNotFoundError:
+        pytest.skip(f'Skipping IDL tests. No IDL installation found at {env.idl_home}.')
+    else:
+        return env
 
 @pytest.fixture
-def ssw_env(idl_home, ssw_home):
-    return hissw.Environment(idl_home=idl_home,
-                             ssw_home=ssw_home,
-                             ssw_packages=['sdo/aia'],
-                             ssw_paths=['aia'])
+def ssw_env(idl_env, ssw_home):
+    env = hissw.Environment(idl_home=idl_env.idl_home,
+                            ssw_home=ssw_home,
+                            ssw_packages=['sdo/aia'],
+                            ssw_paths=['aia'])
+    try:
+        _ = env.run('')
+    except SSWNotFoundError:
+        pytest.skip(f'Skipping SSW tests. No SSW installation found at {env.ssw_home}.')
+    else:
+        return env
 
 
-def test_exception(idl_env):
+def test_exception_idl_command(idl_env):
     """
     Test exception catching
     """
     with pytest.raises(SSWIDLError):
         _ = idl_env.run('foobar')
+
+
+def test_exception_missing_ssw(tmp_path):
+    env = hissw.Environment(ssw_home=tmp_path)
+    with pytest.raises(SSWNotFoundError):
+        _ = env.run('')
+
+
+def test_exception_missing_idl(tmp_path):
+    env = hissw.Environment(idl_home=tmp_path, idl_only=True)
+    with pytest.raises(IDLNotFoundError):
+        _ = env.run('')
 
 
 def test_no_args(idl_env):
@@ -153,11 +176,11 @@ def test_script_from_file(idl_env, tmp_path):
     assert result['foo'] == (a + b)
 
 
-def test_custom_filters(idl_home):
+def test_custom_filters(idl_env):
     filters = {
         'my_filter': lambda x: 'foo' if x < 0.5 else 'bar'
     }
-    env = hissw.Environment(idl_home=idl_home, idl_only=True, filters=filters)
+    env = hissw.Environment(idl_home=idl_env.idl_home, idl_only=True, filters=filters)
     script = '''
     a = '{{ a | my_filter }}'
     b = '{{ b | my_filter }}'
@@ -173,10 +196,10 @@ def test_invalid_script(idl_env):
         _ = idl_env.run(None)
 
 
-def test_custom_header_footer(idl_home):
+def test_custom_header_footer(idl_env):
     header = 'foo = {{ a }}'
     footer = 'bar = {{ a }} + {{ b }}'
-    env_custom = hissw.Environment(idl_home=idl_home, idl_only=True,
+    env_custom = hissw.Environment(idl_home=idl_env.idl_home, idl_only=True,
                                    header=header, footer=footer)
     script = '''
     print, {{ a }}
