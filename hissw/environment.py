@@ -187,7 +187,8 @@ class Environment:
         # Expose the ssw_home variable in all scripts by default
         args.update({'ssw_home': self.ssw_home})
         with tempfile.TemporaryDirectory() as tmpdir:
-            tmpdir_path = pathlib.Path(tmpdir)
+            tmpdir_path = pathlib.Path(tmpdir) / 'hissw_files'
+            tmpdir_path.mkdir(parents=True, exist_ok=True)
             date_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
             # Construct temporary filenames
             save_filename = tmpdir_path / f'idl_vars_{date_string}.sav'
@@ -218,10 +219,8 @@ class Environment:
             path.name if on_windows else f'./{path.name}',
             cwd=path.parent,
             shell=True,
-            # capture_output=True,
-            # text=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            capture_output=True,
+            text=True,
         )
         self._check_for_errors(cmd_output, raise_exceptions=raise_exceptions)
 
@@ -229,8 +228,8 @@ class Environment:
         """
         Check IDL output to try and decide if an error has occurred
         """
-        stdout = f"{output.stdout.decode('utf-8')}"
-        stderr = f"{output.stderr.decode('utf-8')}"
+        stdout = output.stdout
+        stderr = output.stderr
         # NOTE: For some reason, not only errors are output to stderr so we
         # have to check it for certain keywords to see if an error occurred
         if raise_exceptions:
