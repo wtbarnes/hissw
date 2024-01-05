@@ -16,7 +16,7 @@ jobs:
     with:
       # NOTE: These are purposefully set to meaningless directories where there is no SSW
       # or IDL installation so that the relevant tests will be skipped.
-      posargs: '--ssw-home=/home/foo --idl-home=/home/bar'
+      posargs: '--ssw-home=/home/foo --idl-home=/home/bar --log-level=DEBUG'
       toxdeps: tox-pypi-filter
       envs: |
         - macos: py311
