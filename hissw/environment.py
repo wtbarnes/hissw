@@ -187,13 +187,13 @@ class Environment:
         # Expose the ssw_home variable in all scripts by default
         args.update({'ssw_home': self.ssw_home})
         with tempfile.TemporaryDirectory() as tmpdir:
-            tmpdir = pathlib.Path(tmpdir)
+            tmpdir_path = pathlib.Path(tmpdir)
             date_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
             # Construct temporary filenames
-            save_filename = tmpdir / f'idl_vars_{date_string}.sav'
-            procedure_filename = tmpdir / f'idl_procedure_{date_string}.pro'
-            command_filename = tmpdir / f'idl_script_{date_string}.pro'
-            shell_filename = tmpdir / f'ssw_shell_{date_string}.sh'
+            save_filename = tmpdir_path / f'idl_vars_{date_string}.sav'
+            procedure_filename = tmpdir_path / f'idl_procedure_{date_string}.pro'
+            command_filename = tmpdir_path / f'idl_script_{date_string}.pro'
+            shell_filename = tmpdir_path / f'ssw_shell_{date_string}.sh'
             # Render and write scripts
             idl_script = self.custom_script(script, args)
             files = [
@@ -206,19 +206,22 @@ class Environment:
                 with open(filename, 'w') as f:
                     f.write(filescript)
             # Execute
-            os.chmod(shell_filename, mode=stat.S_IRWXU)
-            on_windows = platform.system().lower() == 'windows'
-            cmd_output = subprocess.run(
-                shell_filename.name if on_windows else f'./{shell_filename.name}',
-                cwd=shell_filename.parent,
-                shell=True,
-                capture_output=True,
-                text=True,
-            )
-            self._check_for_errors(cmd_output, raise_exceptions=raise_exceptions)
+            self._run_shell_script(shell_filename, raise_exceptions)
             results = readsav(save_filename)
 
         return results
+
+    def _run_shell_script(self, path, raise_exceptions):
+        os.chmod(path, mode=stat.S_IRWXU)
+        on_windows = platform.system().lower() == 'windows'
+        cmd_output = subprocess.run(
+            path.name if on_windows else f'./{path.name}',
+            cwd=path.parent,
+            shell=True,
+            capture_output=True,
+            text=True,
+        )
+        self._check_for_errors(cmd_output, raise_exceptions=raise_exceptions)
 
     def _check_for_errors(self, output, raise_exceptions=True):
         """
