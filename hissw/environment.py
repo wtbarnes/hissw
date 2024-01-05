@@ -4,6 +4,7 @@ Build SSW scripts from Jinja 2 templates
 import datetime
 import os
 import pathlib
+import platform
 import stat
 import subprocess
 import tempfile
@@ -188,12 +189,12 @@ class Environment:
         with tempfile.TemporaryDirectory() as tmpdir:
             tmpdir = pathlib.Path(tmpdir)
             date_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-            # Get filenames
+            # Construct temporary filenames
             save_filename = tmpdir / f'idl_vars_{date_string}.sav'
             procedure_filename = tmpdir / f'idl_procedure_{date_string}.pro'
             command_filename = tmpdir / f'idl_script_{date_string}.pro'
             shell_filename = tmpdir / f'ssw_shell_{date_string}.sh'
-            # Render and save scripts
+            # Render and write scripts
             idl_script = self.custom_script(script, args)
             files = [
                 (procedure_filename, self.procedure_script(idl_script, save_vars, save_filename)),
@@ -206,8 +207,10 @@ class Environment:
                     f.write(filescript)
             # Execute
             os.chmod(shell_filename, mode=stat.S_IRWXU)
+            on_windows = platform.system().lower() == 'windows'
             cmd_output = subprocess.run(
-                [shell_filename],
+                shell_filename.name if on_windows else f'./{shell_filename.name}',
+                cwd=shell_filename.parent,
                 shell=True,
                 capture_output=True,
                 text=True,
