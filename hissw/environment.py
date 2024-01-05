@@ -4,6 +4,7 @@ Build SSW scripts from Jinja 2 templates
 import datetime
 import os
 import pathlib
+import platform
 import stat
 import subprocess
 import tempfile
@@ -212,14 +213,15 @@ class Environment:
 
     def _run_shell_script(self, path, raise_exceptions):
         os.chmod(path, mode=stat.S_IRWXU)
-        # on_windows = platform.system().lower() == 'windows'
+        on_windows = platform.system().lower() == 'windows'
         cmd_output = subprocess.run(
-            # path.name if on_windows else f'./{path.name}',
-            # cwd=path.parent,
-            [str(path)],
+            path.name if on_windows else f'./{path.name}',
+            cwd=path.parent,
             shell=True,
-            capture_output=True,
-            text=True,
+            # capture_output=True,
+            # text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
         )
         self._check_for_errors(cmd_output, raise_exceptions=raise_exceptions)
 
@@ -227,8 +229,8 @@ class Environment:
         """
         Check IDL output to try and decide if an error has occurred
         """
-        stdout = output.stdout
-        stderr = output.stderr
+        stdout = f"{output.stdout.decode('utf-8')}"
+        stderr = f"{output.stderr.decode('utf-8')}"
         # NOTE: For some reason, not only errors are output to stderr so we
         # have to check it for certain keywords to see if an error occurred
         if raise_exceptions:

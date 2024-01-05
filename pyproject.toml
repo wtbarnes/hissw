@@ -89,6 +89,7 @@ extend-ignore = [
     "PT007",  # Parametrize should be lists of tuples  # TODO! fix
     "PT011",  # Too broad exception assert             # TODO! fix
     "PT023",  # Always use () on pytest decorators
+    "UP022",
 ]
 
 [tool.ruff.per-file-ignores]
