@@ -4,7 +4,6 @@ Build SSW scripts from Jinja 2 templates
 import datetime
 import os
 import pathlib
-import platform
 import stat
 import subprocess
 import tempfile
@@ -213,10 +212,11 @@ class Environment:
 
     def _run_shell_script(self, path, raise_exceptions):
         os.chmod(path, mode=stat.S_IRWXU)
-        on_windows = platform.system().lower() == 'windows'
+        # on_windows = platform.system().lower() == 'windows'
         cmd_output = subprocess.run(
-            path.name if on_windows else f'./{path.name}',
-            cwd=path.parent,
+            # path.name if on_windows else f'./{path.name}',
+            # cwd=path.parent,
+            [str(path)],
             shell=True,
             capture_output=True,
             text=True,
