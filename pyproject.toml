@@ -1,7 +1,7 @@
 [build-system]
 requires = [
     "setuptools",
-    "setuptools_scm",
+    "setuptools_scm[toml]",
     "wheel",
 ]
 build-backend = 'setuptools.build_meta'
@@ -9,13 +9,9 @@ build-backend = 'setuptools.build_meta'
 [project]
 name = "hissw"
 dynamic = ["version"]
-requires-python = ">=3.9"
-dependencies = [
-    "jinja2",
-    "scipy",
-]
 description = "Seamlessly integrate SSWIDL code into your Python workflow"
 readme = {file="README.md", content-type = "text/markdown"}
+license = { file = "LICENSE.rst" }
 authors = [
     {name="Will Barnes", email="will.t.barnes@gmail.com"},
     {name="Bin Chen"},
@@ -35,6 +31,11 @@ keywords = [
     "sswidl",
     "solarsoft",
 ]
+requires-python = ">=3.9"
+dependencies = [
+    "jinja2",
+    "scipy",
+]
 
 [project.urls]
 Homepage = "https://github.com/wtbarnes/hissw/"
@@ -42,15 +43,14 @@ Documentation = "https://wtbarnes.github.io/hissw/"
 Source = "https://github.com/wtbarnes/hissw/"
 
 [project.optional-dependencies]
-astropy = ["astropy"]
-test = ["pytest", "astropy"]
-docs = ["mkdocs", "mkdocs-material"]
+all = ["hissw"]
+astropy = ["hissw", "astropy"]
+test = ["hissw[all]", "pytest", "astropy"]
+docs = ["hissw[all]", "mkdocs", "mkdocs-material"]
+dev = ["hissw[test,docs]"]
 
-[tool.setuptools.packages.find]
-where = ["hissw"]
-
-[tool.setuptools.package-data]
-hissw = ["templates/*.pro", "templates/*.sh"]
+[tool.setuptools]
+packages = ["hissw"]
 
 [tool.setuptools_scm]
 
