@@ -117,7 +117,9 @@ class Environment:
         """
         Render custom IDL scripts from templates and input arguments
         """
-        if isinstance(script, (str, pathlib.Path)) and pathlib.Path(script).is_file():
+        # NOTE: purposefully using os.path.isfile instead of pathlib.Path.is_file
+        # because the latter may throw an exception when the string is really long.
+        if isinstance(script, (str, pathlib.Path)) and os.path.isfile(script):
             with open(script) as f:
                 script = f.read()
         if not isinstance(script, str):
@@ -184,8 +186,6 @@ class Environment:
         """
         save_vars = [] if save_vars is None else save_vars
         args = {} if args is None else args
-        # Expose the ssw_home variable in all scripts by default
-        args.update({'ssw_home': self.ssw_home})
         with tempfile.TemporaryDirectory() as tmpdir:
             tmpdir_path = pathlib.Path(tmpdir) / 'hissw_files'
             tmpdir_path.mkdir(parents=True, exist_ok=True)
@@ -196,7 +196,8 @@ class Environment:
             command_filename = tmpdir_path / f'idl_script_{date_string}.pro'
             shell_filename = tmpdir_path / f'ssw_shell_{date_string}.sh'
             # Render and write scripts
-            idl_script = self.custom_script(script, args)
+            # NOTE: Expose the ssw_home variable in all scripts by default
+            idl_script = self.custom_script(script, {'ssw_home': self.ssw_home, **args})
             files = [
                 (procedure_filename, self.procedure_script(idl_script, save_vars, save_filename)),
                 (command_filename, self.command_script(procedure_filename)),
