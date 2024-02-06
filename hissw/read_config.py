@@ -3,14 +3,18 @@ Read some default options if possible
 """
 
 import os
+import pathlib
 import configparser
+
+HISSW_DIR = pathlib.Path.home() / '.hissw'
+HISSW_RC = HISSW_DIR / 'hisswrc'
 
 
 defaults = {}
-defaults['hissw_home'] = os.path.join(os.environ['HOME'], '.hissw')
-if os.path.isfile(os.path.join(os.environ['HOME'], '.hissw', 'hisswrc')):
+defaults['hissw_home'] = HISSW_DIR
+if HISSW_RC.is_file():
     config = configparser.ConfigParser()
-    config.read(os.path.join(os.environ['HOME'], '.hissw', 'hisswrc'))
+    config.read(HISSW_RC)
     for key in config['hissw']:
         defaults[key] = config['hissw'][key]
 else:
