@@ -17,7 +17,7 @@ $ pip install hissw
 ```
 
 which will automatically install the package and its dependencies.
-hissw depends on the [Jinja2](http://jinja.pocoo.org/docs/dev/) and [scipy](https://docs.scipy.org/doc/) libraries. 
+hissw depends on the [Jinja2](http://jinja.pocoo.org/docs/dev/) and [scipy](https://docs.scipy.org/doc/) libraries.
 You can also install these manually with [conda](https://www.anaconda.com/download/) or from PyPI, i.e. `pip install <package-name>`.
 Additionally, you'll need a local install of IDL and the [Solarsoft library](http://www.lmsal.com/solarsoft/).
 

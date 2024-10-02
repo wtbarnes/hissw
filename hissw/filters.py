@@ -29,7 +29,7 @@ def log10_filter(value):
 def string_list_filter(string_list):
     """
     Double quote a list of strings.
-    
+
     This is needed when passing in a list of strings to IDL as each string
     in the list will not be quoted when passed into the template.
     """
@@ -54,9 +54,9 @@ def force_double_precision_filter(value):
         str_list = [force_double_precision_filter(x) for x in value]
         # NOTE: this has to be done manually because each entry is formatted as a
         # string such that the division is not evaluated in Python. However, we
-        # want this to be inserted as an array of integer divison operations.
+        # want this to be inserted as an array of integer division operations.
         return f"[{','.join(str_list)}]"
     else:
-        # If it is neither an array or list, 
+        # If it is neither an array or list,
         a, b = value.as_integer_ratio()
         return f'{a}d / {b}d'
