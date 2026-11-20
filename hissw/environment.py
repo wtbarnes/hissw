@@ -4,8 +4,6 @@ Build SSW scripts from Jinja 2 templates
 import datetime
 import os
 import pathlib
-import platform
-import stat
 import subprocess
 import tempfile
 
@@ -231,17 +229,13 @@ class Environment:
         return results
 
     def _run_shell_script(self, path, raise_exceptions):
-        os.chmod(path, mode=stat.S_IRWXU)
-        on_windows = platform.system().lower() == 'windows'
         # Jupyter sets these to force colour onto pipes, which on macOS puts
         # escape codes in the filenames IDL's findfile reads back from `ls`.
         # See https://github.com/wtbarnes/hissw/issues/37
         env = {k: v for k, v in os.environ.items()
                if k not in ('CLICOLOR_FORCE', 'FORCE_COLOR')}
         cmd_output = subprocess.run(
-            path.name if on_windows else f'./{path.name}',
-            cwd=path.parent,
-            shell=True,
+            ['tcsh', str(path)],
             capture_output=True,
             # No stdin, so an IDL routine asking for input fails at once instead
             # of waiting forever, e.g. in a notebook where nobody can answer.
