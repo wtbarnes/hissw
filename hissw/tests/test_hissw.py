@@ -142,6 +142,12 @@ def test_idl_cannot_read_our_stdin(idl_env):
         os.close(read_end)
 
 
+def test_no_results_raises(idl_env):
+    # An early return does not print "execution halted", but nothing is saved
+    with pytest.raises(SSWIDLError, match='IDL did not save any results'):
+        idl_env.run("a = 1\nreturn")
+
+
 def test_missing_argument_raises(render_env):
     with pytest.raises(jinja2.UndefinedError, match="'a' is undefined"):
         render_env.render_script('foo = {{ a }} + 1', {'A': 5})

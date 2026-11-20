@@ -217,7 +217,10 @@ class Environment:
                 with open(filename, 'w') as f:
                     f.write(filescript)
             # Execute
-            self._run_shell_script(shell_filename, raise_exceptions)
+            stderr = self._run_shell_script(shell_filename, raise_exceptions)
+            if not save_filename.exists():
+                # IDL never reached the save, e.g. an early return or a missing tcsh
+                raise SSWIDLError(f'IDL did not save any results.\n{stderr}')
             results = readsav(save_filename)
 
         return results
@@ -244,6 +247,7 @@ class Environment:
             env=env,
         )
         self._check_for_errors(cmd_output, raise_exceptions=raise_exceptions)
+        return cmd_output.stderr
 
     def _check_for_errors(self, output, raise_exceptions=True):
         """
