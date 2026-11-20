@@ -64,7 +64,10 @@ class Environment:
         self.ssw_packages = ssw_packages if ssw_packages is not None else []
         self.ssw_paths = ssw_paths if ssw_paths is not None else []
         self.extra_paths = extra_paths if extra_paths is not None else []
-        self.env = jinja2.Environment(loader=jinja2.PackageLoader('hissw', 'templates'))
+        # StrictUndefined: a missing argument otherwise renders as nothing, which
+        # can still be valid IDL, e.g. "foo = {{ a }} + 1" becomes "foo =  + 1".
+        self.env = jinja2.Environment(loader=jinja2.PackageLoader('hissw', 'templates'),
+                                      undefined=jinja2.StrictUndefined)
         self._setup_filters(filters)
         self.header = '' if header is None else header
         self.footer = '' if footer is None else footer

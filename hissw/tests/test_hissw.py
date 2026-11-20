@@ -2,6 +2,7 @@
 Module level tests
 """
 import astropy.units as u
+import jinja2
 import numpy as np
 import pytest
 
@@ -115,6 +116,11 @@ def test_logging(idl_env, caplog, log_level, log_record_length):
     caplog.set_level(log_level)
     _ = idl_env.run('print, "Hello World"')
     assert len(caplog.records) == log_record_length
+
+
+def test_missing_argument_raises(render_env):
+    with pytest.raises(jinja2.UndefinedError, match="'a' is undefined"):
+        render_env.render_script('foo = {{ a }} + 1', {'A': 5})
 
 
 def test_aia_response_functions(ssw_env):
