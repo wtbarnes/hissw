@@ -22,7 +22,7 @@ You can also install the above dependencies with [`conda`](https://www.anaconda.
 ```shell
 $ git clone https://github.com/wtbarnes/hissw.git
 $ cd hissw
-$ python setup.py install
+$ pip install .
 ```
 
 Lastly, you can set the locations of your IDL and SSW installs in a configuration file located in `$HOME/.hissw/hisswrc`,

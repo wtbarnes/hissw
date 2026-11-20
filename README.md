@@ -25,7 +25,7 @@ Alternatively, you can install hissw from GitHub,
 
 ```shell
 $ git clone https://github.com/wtbarnes/hissw.git
-$ cd hissw && python -m pip install -e[all,test]
+$ cd hissw && python -m pip install -e ".[test]"
 ```
 
 and then run the tests to make sure everything is working alright. Note that you must specify paths to SSW and IDL appropriately.

@@ -34,7 +34,7 @@ class Environment:
     ssw_home : `str`, optional
         Root of SSW tree
     idl_home : `str`, optional
-        Path to IDL executable
+        Top level directory of the IDL install, i.e. the one containing ``bin/idl``
     filters : `dict`, optional
         Filters to use in scripts. This should be a dictionary where the key
         is the name of the filter and the value is the corresponding
@@ -42,10 +42,10 @@ class Environment:
     idl_only : `bool`, optional
         If True, do not do any setup associated with SSW. This is useful
         if your script has no SSW dependence.
-    header_script : `str` or path-like, optional
+    header : `str` or path-like, optional
         Script to run before script passed to ``run`` method. Can use any
         of the variables passed to ``run``.
-    footer_script : `str` or path-like, optional
+    footer : `str` or path-like, optional
         Script to run after script passed to ``run`` method. Can use any
         of the variables passed to ``run``.
     """
