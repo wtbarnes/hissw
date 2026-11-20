@@ -49,8 +49,11 @@ test = ["hissw[all]", "pytest", "astropy"]
 docs = ["hissw[all]", "mkdocs", "mkdocs-material"]
 dev = ["hissw[test,docs]"]
 
-[tool.setuptools]
-packages = ["hissw"]
+[tool.setuptools.packages.find]
+include = ["hissw*"]
+
+[tool.setuptools.package-data]
+hissw = ["templates/*"]
 
 [tool.setuptools_scm]
 
