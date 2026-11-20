@@ -184,6 +184,12 @@ class Environment:
             as a flag because not raising an exception is sometimes useful
             for debugging.
         """
+        # NOTE: Check the paths rather than the shell's error messages, which
+        # are only produced where tcsh is installed.
+        if not self.idl_only and not (self.ssw_home.expanduser() / 'gen' / 'setup' / 'setup.ssw').is_file():
+            raise SSWNotFoundError(f'No SSW installation found at {self.ssw_home}.')
+        if not (self.idl_home.expanduser() / 'bin' / 'idl').is_file():
+            raise IDLNotFoundError(f'No IDL installation found at {self.idl_home}.')
         save_vars = [] if save_vars is None else save_vars
         args = {} if args is None else args
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -238,9 +244,5 @@ class Environment:
                 raise SSWIDLError(stderr)
             if 'failed to acquire license' in stderr.lower():
                 raise IDLLicenseError(stderr)
-            if 'setup.ssw: no such file or directory' in stderr.lower():
-                raise SSWNotFoundError(f'No SSW installation found at {self.ssw_home}.')
-            if 'idl: command not found' in stderr.lower():
-                raise IDLNotFoundError(f'No IDL installation found at {self.idl_home}.')
         self.log.warning(stderr)
         self.log.info(stdout)
