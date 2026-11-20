@@ -199,6 +199,18 @@ def test_default_ssw_var(ssw_env):
     assert res['foo'].decode('utf-8') == str(ssw_env.ssw_home)
 
 
+def test_forced_colour_not_passed_to_idl(idl_env, monkeypatch):
+    # See https://github.com/wtbarnes/hissw/issues/37
+    monkeypatch.setenv('CLICOLOR_FORCE', '1')
+    monkeypatch.setenv('FORCE_COLOR', '1')
+    res = idl_env.run('''
+    clicolor_force = getenv('CLICOLOR_FORCE')
+    force_color = getenv('FORCE_COLOR')
+    ''')
+    assert not res['clicolor_force']
+    assert not res['force_color']
+
+
 def test_script_from_file(idl_env, tmp_path):
     script = '''foo = {{a}} + {{b}}'''
     script_file = tmp_path / 'test_script.pro'

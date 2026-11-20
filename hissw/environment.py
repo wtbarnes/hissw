@@ -222,12 +222,18 @@ class Environment:
     def _run_shell_script(self, path, raise_exceptions):
         os.chmod(path, mode=stat.S_IRWXU)
         on_windows = platform.system().lower() == 'windows'
+        # Jupyter sets these to force colour onto pipes, which on macOS puts
+        # escape codes in the filenames IDL's findfile reads back from `ls`.
+        # See https://github.com/wtbarnes/hissw/issues/37
+        env = {k: v for k, v in os.environ.items()
+               if k not in ('CLICOLOR_FORCE', 'FORCE_COLOR')}
         cmd_output = subprocess.run(
             path.name if on_windows else f'./{path.name}',
             cwd=path.parent,
             shell=True,
             capture_output=True,
             text=True,
+            env=env,
         )
         self._check_for_errors(cmd_output, raise_exceptions=raise_exceptions)
 
