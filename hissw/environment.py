@@ -235,6 +235,9 @@ class Environment:
             cwd=path.parent,
             shell=True,
             capture_output=True,
+            # No stdin, so an IDL routine asking for input fails at once instead
+            # of waiting forever, e.g. in a notebook where nobody can answer.
+            stdin=subprocess.DEVNULL,
             text=True,
             # IDL output is not always UTF-8, and a stray byte must not cost the results
             errors='replace',

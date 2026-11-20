@@ -1,6 +1,8 @@
 """
 Module level tests
 """
+import os
+
 import astropy.units as u
 import jinja2
 import numpy as np
@@ -122,6 +124,22 @@ def test_non_utf8_output(idl_env):
     # 197B is a Latin-1 Angstrom sign, which is not valid UTF-8
     res = idl_env.run("a = 1\nprint, string(197B)")
     assert res['a'] == 1
+
+
+def test_idl_cannot_read_our_stdin(idl_env):
+    # Put a line on our stdin. If IDL inherited it, `read` would succeed.
+    read_end, write_end = os.pipe()
+    os.write(write_end, b'hello\n')
+    os.close(write_end)
+    original_stdin = os.dup(0)
+    os.dup2(read_end, 0)
+    try:
+        with pytest.raises(SSWIDLError, match='End of file encountered'):
+            idl_env.run("x = ''\nread, x")
+    finally:
+        os.dup2(original_stdin, 0)
+        os.close(original_stdin)
+        os.close(read_end)
 
 
 def test_missing_argument_raises(render_env):
