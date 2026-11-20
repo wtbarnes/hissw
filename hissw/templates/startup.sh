@@ -1,10 +1,10 @@
 #!/bin/tcsh
+{% if use_ssw %}
 # Set SSW home
 setenv SSW {{ ssw_home }}
 # Set SSW instruments
 setenv SSW_INSTR "{{ ssw_packages | join(' ') }}"
 # Setup needed environment variables
-{% if use_ssw %}
 source $SSW/gen/setup/setup.ssw
 {% endif %}
 # Setup IDL environment

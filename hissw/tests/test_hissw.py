@@ -61,6 +61,13 @@ def test_rendered_scripts():
     assert "save,filename='out.sav'" in env.procedure_script('a = 1', [], 'out.sav')
 
 
+def test_idl_only_script_does_not_set_ssw(render_env):
+    # ssw_home is None here, which used to be written out as "setenv SSW None"
+    shell = render_env.shell_script('command.pro')
+    assert 'setenv SSW' not in shell
+    assert '/not/used/bin/idl command.pro' in shell
+
+
 def test_exception_idl_command(idl_env):
     """
     Test exception catching
