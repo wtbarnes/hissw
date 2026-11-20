@@ -21,6 +21,7 @@ jobs:
         - windows: py313
         - linux: py313
         - linux: py314
+        - linux: py315
         - linux: py313-oldestdeps
   sdist_verify:
     runs-on: ubuntu-latest
