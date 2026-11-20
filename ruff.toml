@@ -1,0 +1,32 @@
+target-version = "py313"
+line-length = 110
+exclude = [
+    ".git,",
+    "__pycache__",
+    "build",
+    "hissw/version.py",
+]
+show-fixes = true
+lint.select = [
+    "E",
+    "F",
+    "W",
+    "UP",
+    "PT",
+]
+lint.extend-ignore = [
+    "E501",  # Line too long
+    "PT001",  # Always use pytest.fixture()
+    "PT007",  # Parametrize should be lists of tuples
+    "PT011",  # Too broad exception assert
+    "PT023",  # Always use () on pytest decorators
+]
+
+[lint.per-file-ignores]
+"setup.py" = ["INP001"]
+"conftest.py" = ["INP001"]
+"__init__.py" = ["E402", "F401", "F403"]
+"test_*.py" = ["B011", "D", "E402", "PGH001", "S101"]
+
+[lint.pydocstyle]
+convention = "numpy"
