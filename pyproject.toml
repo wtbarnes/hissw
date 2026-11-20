@@ -75,8 +75,8 @@ exclude=[
     "hissw/version.py",
 ]
 show-fixes = true
-show-source = true
 
+[tool.ruff.lint]
 select = [
        "E",
        "F",
@@ -93,13 +93,12 @@ extend-ignore = [
 
     # pytest (PT)
     "PT001",  # Always use pytest.fixture()
-    "PT004",  # Fixtures which don't return anything should have leading _
     "PT007",  # Parametrize should be lists of tuples  # TODO! fix
     "PT011",  # Too broad exception assert             # TODO! fix
     "PT023",  # Always use () on pytest decorators
 ]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 # Part of configuration, not a package.
 "setup.py" = ["INP001"]
 "conftest.py" = ["INP001"]
@@ -108,5 +107,5 @@ extend-ignore = [
 "test_*.py" = ["B011", "D", "E402", "PGH001", "S101"]
 
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "numpy"
