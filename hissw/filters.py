@@ -29,10 +29,10 @@ def log10_filter(value):
 
 def string_list_filter(string_list):
     """
-    Double quote a list of strings.
+    Quote each string in a list so the list can be joined into an IDL array.
 
-    This is needed when passing in a list of strings to IDL as each string
-    in the list will not be quoted when passed into the template.
+    Use it together with ``join``, e.g. ``[{{ files | string_list | join(',') }}]``.
+    Used on its own, the quotes end up inside the IDL strings.
     """
     return [f"'{s}'" for s in string_list]
 

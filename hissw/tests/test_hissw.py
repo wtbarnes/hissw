@@ -220,11 +220,11 @@ def test_log10_filter_array(idl_env):
 
 def test_string_list_filter(idl_env):
     script = """
-    foo = {{ foo | string_list }}
+    foo = [{{ foo | string_list | join(',') }}]
     """
     foo = ['my', 'list', 'of', 'strings']
     res = idl_env.run(script, args={'foo': foo})
-    assert [v.decode('utf-8') for v in res['foo']] == [f"'{f}'" for f in foo]
+    assert [v.decode('utf-8') for v in res['foo']] == foo
 
 
 def test_default_ssw_var(ssw_env):
