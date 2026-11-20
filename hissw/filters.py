@@ -16,22 +16,23 @@ def units_filter(quantity, unit):
     import astropy.units as u  # Avoid astropy as a hard dependency
     if not isinstance(quantity, u.Quantity):
         raise u.UnitsError(f'Value must be a quantity with units compatible with {unit}')
-    return quantity.to_value(unit)
+    # tolist: NumPy 2 scalars in a list print as np.float64(...), not valid IDL
+    return quantity.to_value(unit).tolist()
 
 
 def log10_filter(value):
     """
     Take the base 10 log of a given value.
     """
-    return np.log10(value)
+    return np.log10(value).tolist()  # see units_filter
 
 
 def string_list_filter(string_list):
     """
-    Double quote a list of strings.
+    Quote each string in a list so the list can be joined into an IDL array.
 
-    This is needed when passing in a list of strings to IDL as each string
-    in the list will not be quoted when passed into the template.
+    Use it together with ``join``, e.g. ``[{{ files | string_list | join(',') }}]``.
+    Used on its own, the quotes end up inside the IDL strings.
     """
     return [f"'{s}'" for s in string_list]
 
@@ -50,7 +51,7 @@ def force_double_precision_filter(value):
     IDL into Python. When used in combination with other filters, this filter should
     be used last as it forces a conversion to a list of strings.
     """
-    if isinstance(value, (np.ndarray, list)):
+    if isinstance(value, (np.ndarray, list, tuple)):
         str_list = [force_double_precision_filter(x) for x in value]
         # NOTE: this has to be done manually because each entry is formatted as a
         # string such that the division is not evaluated in Python. However, we
@@ -58,5 +59,11 @@ def force_double_precision_filter(value):
         return f"[{','.join(str_list)}]"
     else:
         # If it is neither an array or list,
+        value = float(value)  # NumPy integers have no as_integer_ratio
+        # NaN and infinity have no integer ratio, so use IDL's own names for them
+        if np.isnan(value):
+            return '!values.d_nan'
+        if np.isinf(value):
+            return ('-' if value < 0 else '') + '!values.d_infinity'
         a, b = value.as_integer_ratio()
         return f'{a}d / {b}d'

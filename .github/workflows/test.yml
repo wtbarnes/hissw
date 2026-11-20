@@ -12,33 +12,43 @@ on:
 
 jobs:
   test:
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@1285b95e32c783cfa40eb2ffbd6ca4cd023fb884  # v3.2.2
     with:
-      # NOTE: These are purposefully set to meaningless directories where there is no SSW
-      # or IDL installation so that the relevant tests will be skipped.
-      posargs: '--ssw-home=/foo/bar --idl-home=/hello/world --log-level=DEBUG'
+      posargs: '--log-level=DEBUG'
       toxdeps: tox-pypi-filter
       envs: |
-        - macos: py311
-        - windows: py311
-        - linux: py39
-        - linux: py310
-        - linux: py311
+        - linux: py315
+        - macos: py314
+        - windows: py313
+        - linux: py313-oldestdeps
+  sdist_verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        with:
+          python-version: '3.14'
+      - run: python -m pip install -U --user build twine "validate-pyproject[all]"
+      - run: validate-pyproject pyproject.toml
+      - run: python -m build . --sdist
+      - run: python -m twine check --strict dist/*
   codestyle:
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@1285b95e32c783cfa40eb2ffbd6ca4cd023fb884  # v3.2.2
     with:
       toxdeps: tox-pypi-filter
       envs: |
         - linux: codestyle
-          python-version: '3.11'
+          python-version: '3.13'
   docs:
     needs: [test]
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@1285b95e32c783cfa40eb2ffbd6ca4cd023fb884  # v3.2.2
     with:
       toxdeps: tox-pypi-filter
       envs: |
         - linux: build_docs
-          python-version: '3.11'
+          python-version: '3.13'
   publish:
     # Build wheels when pushing to any branch except main
     # publish.yml will only publish if tagged ^v.*
@@ -52,12 +62,12 @@ jobs:
         github.event_name == 'pull_request' &&
         contains(github.event.pull_request.labels.*.name, 'Run publish')
       )
-    needs: [test]
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@main
+    needs: [test, sdist_verify]
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@1285b95e32c783cfa40eb2ffbd6ca4cd023fb884  # v3.2.2
     with:
       test_extras: 'dev'
       test_command: 'pytest -p no:warnings --pyargs hissw'
       submodules: false
-      python-version: '3.11'
+      python-version: '3.13'
     secrets:
       pypi_token: ${{ secrets.PYPI_TOKEN }}

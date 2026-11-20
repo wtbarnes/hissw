@@ -2,7 +2,7 @@
 Any utility functions
 """
 
-__all__ = ['SSWIDLError', 'IDLLicenseError']
+__all__ = ['SSWIDLError', 'SSWNotFoundError', 'IDLLicenseError', 'IDLNotFoundError']
 
 
 class SSWIDLError(Exception):

@@ -4,10 +4,9 @@ Build SSW scripts from Jinja 2 templates
 import datetime
 import os
 import pathlib
-import platform
-import stat
 import subprocess
 import tempfile
+import warnings
 
 import jinja2
 from scipy.io import readsav
@@ -36,7 +35,7 @@ class Environment:
     ssw_home : `str`, optional
         Root of SSW tree
     idl_home : `str`, optional
-        Path to IDL executable
+        Top level directory of the IDL install, i.e. the one containing ``bin/idl``
     filters : `dict`, optional
         Filters to use in scripts. This should be a dictionary where the key
         is the name of the filter and the value is the corresponding
@@ -44,10 +43,10 @@ class Environment:
     idl_only : `bool`, optional
         If True, do not do any setup associated with SSW. This is useful
         if your script has no SSW dependence.
-    header_script : `str` or path-like, optional
+    header : `str` or path-like, optional
         Script to run before script passed to ``run`` method. Can use any
         of the variables passed to ``run``.
-    footer_script : `str` or path-like, optional
+    footer : `str` or path-like, optional
         Script to run after script passed to ``run`` method. Can use any
         of the variables passed to ``run``.
     """
@@ -61,10 +60,18 @@ class Environment:
         self.idl_only = idl_only
         self.ssw_home = ssw_home
         self.idl_home = idl_home
+        for name, value in [('ssw_packages', ssw_packages), ('ssw_paths', ssw_paths),
+                            ('extra_paths', extra_paths)]:
+            if isinstance(value, str):
+                # A string would be split into letters, e.g. SSW_INSTR "c h i a n t i"
+                raise TypeError(f'{name} must be a list, not a string.')
         self.ssw_packages = ssw_packages if ssw_packages is not None else []
         self.ssw_paths = ssw_paths if ssw_paths is not None else []
         self.extra_paths = extra_paths if extra_paths is not None else []
-        self.env = jinja2.Environment(loader=jinja2.PackageLoader('hissw', 'templates'))
+        # StrictUndefined: a missing argument otherwise renders as nothing, which
+        # can still be valid IDL, e.g. "foo = {{ a }} + 1" becomes "foo =  + 1".
+        self.env = jinja2.Environment(loader=jinja2.PackageLoader('hissw', 'templates'),
+                                      undefined=jinja2.StrictUndefined)
         self._setup_filters(filters)
         self.header = '' if header is None else header
         self.footer = '' if footer is None else footer
@@ -167,7 +174,7 @@ class Environment:
                   'command_filename': command_filename}
         return self.env.get_template('startup.sh').render(**params)
 
-    def run(self, script, args=None, save_vars=None, raise_exceptions=True):
+    def run(self, script, args=None, save_vars=None, raise_exceptions=True, verbose=None):
         """
         Set up the SSWIDL environment and run the supplied scripts.
 
@@ -183,7 +190,18 @@ class Environment:
             If True, raise an exception based on the IDL output. This is left
             as a flag because not raising an exception is sometimes useful
             for debugging.
+        verbose : bool, optional
+            Deprecated and ignored. IDL output is sent to the ``hissw`` logger.
         """
+        if verbose is not None:
+            warnings.warn('The verbose keyword is deprecated and has no effect. IDL output '
+                          'is sent to the "hissw" logger.', DeprecationWarning, stacklevel=2)
+        # NOTE: Check the paths rather than the shell's error messages, which
+        # are only produced where tcsh is installed.
+        if not self.idl_only and not (self.ssw_home.expanduser() / 'gen' / 'setup' / 'setup.ssw').is_file():
+            raise SSWNotFoundError(f'No SSW installation found at {self.ssw_home}.')
+        if not (self.idl_home.expanduser() / 'bin' / 'idl').is_file():
+            raise IDLNotFoundError(f'No IDL installation found at {self.idl_home}.')
         save_vars = [] if save_vars is None else save_vars
         args = {} if args is None else args
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -208,22 +226,33 @@ class Environment:
                 with open(filename, 'w') as f:
                     f.write(filescript)
             # Execute
-            self._run_shell_script(shell_filename, raise_exceptions)
+            stderr = self._run_shell_script(shell_filename, raise_exceptions)
+            if not save_filename.exists():
+                # IDL never reached the save, e.g. an early return or a missing tcsh
+                raise SSWIDLError(f'IDL did not save any results.\n{stderr}')
             results = readsav(save_filename)
 
         return results
 
     def _run_shell_script(self, path, raise_exceptions):
-        os.chmod(path, mode=stat.S_IRWXU)
-        on_windows = platform.system().lower() == 'windows'
+        # Jupyter sets these to force colour onto pipes, which on macOS puts
+        # escape codes in the filenames IDL's findfile reads back from `ls`.
+        # See https://github.com/wtbarnes/hissw/issues/37
+        env = {k: v for k, v in os.environ.items()
+               if k not in ('CLICOLOR_FORCE', 'FORCE_COLOR')}
         cmd_output = subprocess.run(
-            path.name if on_windows else f'./{path.name}',
-            cwd=path.parent,
-            shell=True,
+            ['tcsh', str(path)],
             capture_output=True,
+            # No stdin, so an IDL routine asking for input fails at once instead
+            # of waiting forever, e.g. in a notebook where nobody can answer.
+            stdin=subprocess.DEVNULL,
             text=True,
+            # IDL output is not always UTF-8, and a stray byte must not cost the results
+            errors='replace',
+            env=env,
         )
         self._check_for_errors(cmd_output, raise_exceptions=raise_exceptions)
+        return cmd_output.stderr
 
     def _check_for_errors(self, output, raise_exceptions=True):
         """
@@ -238,9 +267,5 @@ class Environment:
                 raise SSWIDLError(stderr)
             if 'failed to acquire license' in stderr.lower():
                 raise IDLLicenseError(stderr)
-            if 'setup.ssw: no such file or directory' in stderr.lower():
-                raise SSWNotFoundError(f'No SSW installation found at {self.ssw_home}.')
-            if 'idl: command not found' in stderr.lower():
-                raise IDLNotFoundError(f'No IDL installation found at {self.idl_home}.')
         self.log.warning(stderr)
         self.log.info(stdout)
