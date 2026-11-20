@@ -11,9 +11,9 @@ import numpy as np
 import pytest
 
 import hissw
+from hissw import IDLNotFoundError, SSWIDLError, SSWNotFoundError
 from hissw.filters import (force_double_precision_filter, log10_filter,
                            units_filter)
-from hissw.util import IDLNotFoundError, SSWIDLError, SSWNotFoundError
 
 
 @pytest.fixture
