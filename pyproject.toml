@@ -54,6 +54,10 @@ packages = ["hissw"]
 
 [tool.setuptools_scm]
 
+[tool.pytest.ini_options]
+# So that hissw/conftest.py, which defines --idl-home, is loaded before the options are parsed
+testpaths = ["hissw"]
+
 [tool.codespell]
 skip = "*.fts,*.fits,venv,*.pro,*.asdf,*.sh"
 
