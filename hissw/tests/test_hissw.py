@@ -63,6 +63,12 @@ def test_rendered_scripts():
     assert "save,filename='out.sav'" in env.procedure_script('a = 1', [], 'out.sav')
 
 
+@pytest.mark.parametrize('name', ['ssw_packages', 'ssw_paths', 'extra_paths'])
+def test_string_instead_of_list_raises(name):
+    with pytest.raises(TypeError, match=f'{name} must be a list'):
+        hissw.Environment(idl_home='/not/used', idl_only=True, **{name: 'chianti'})
+
+
 def test_idl_only_script_does_not_set_ssw(render_env):
     # ssw_home is None here, which used to be written out as "setenv SSW None"
     shell = render_env.shell_script('command.pro')

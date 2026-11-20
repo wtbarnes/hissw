@@ -61,6 +61,11 @@ class Environment:
         self.idl_only = idl_only
         self.ssw_home = ssw_home
         self.idl_home = idl_home
+        for name, value in [('ssw_packages', ssw_packages), ('ssw_paths', ssw_paths),
+                            ('extra_paths', extra_paths)]:
+            if isinstance(value, str):
+                # A string would be split into letters, e.g. SSW_INSTR "c h i a n t i"
+                raise TypeError(f'{name} must be a list, not a string.')
         self.ssw_packages = ssw_packages if ssw_packages is not None else []
         self.ssw_paths = ssw_paths if ssw_paths is not None else []
         self.extra_paths = extra_paths if extra_paths is not None else []
