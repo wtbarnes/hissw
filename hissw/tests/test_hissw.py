@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 
 import hissw
+from hissw.filters import log10_filter, units_filter
 from hissw.util import IDLNotFoundError, SSWIDLError, SSWNotFoundError
 
 
@@ -31,6 +32,29 @@ def ssw_env(idl_env, ssw_home):
         pytest.skip(f'Skipping SSW tests. No SSW installation found at {env.ssw_home}.')
     else:
         return env
+
+
+@pytest.fixture
+def render_env():
+    # For tests that build scripts but never start IDL
+    return hissw.Environment(idl_home='/not/used', idl_only=True)
+
+
+def test_rendered_scripts():
+    env = hissw.Environment(idl_home='/idl', ssw_home='/ssw',
+                            ssw_packages=['sdo/aia', 'chianti'], ssw_paths=['aia', 'xrt'],
+                            extra_paths=['/my/code'])
+    shell = env.shell_script('command.pro')
+    assert 'setenv SSW /ssw\n' in shell
+    assert 'setenv SSW_INSTR "sdo/aia chianti"\n' in shell
+    assert 'setenv IDL_DIR /idl\n' in shell
+    assert 'sswidl command.pro' in shell
+    command = env.command_script('procedure.pro')
+    assert 'ssw_path,/aia, /xrt\n' in command
+    assert "!PATH=EXPAND_PATH('/my/code')+':'+!PATH\n" in command
+    assert '.run procedure.pro\n' in command
+    assert "save,a,b,filename='out.sav'" in env.procedure_script('a = 1', ['a', 'b'], 'out.sav')
+    assert "save,filename='out.sav'" in env.procedure_script('a = 1', [], 'out.sav')
 
 
 def test_exception_idl_command(idl_env):
@@ -122,13 +146,13 @@ def test_units_filter(idl_env):
     assert np.allclose(res['foo'], 1e6)
 
 
-def test_units_filter_exception(idl_env):
+def test_units_filter_exception(render_env):
     script = """
     foo = {{ foo | to_unit('K') }}
     """
     with pytest.raises(u.UnitsError,
                        match='Value must be a quantity with units compatible with K'):
-        _= idl_env.run(script, args={'foo': 1})
+        _ = render_env.render_script(script, {'foo': 1})
 
 
 def test_units_filter_array(idl_env):
@@ -146,6 +170,16 @@ def test_log10_filter(idl_env):
     foo = 1e6
     res = idl_env.run(script, args={'foo': foo})
     assert res['foo'] == np.log10(foo)
+
+
+def test_filters_render_arrays_as_valid_idl():
+    assert str(units_filter([1, 2]*u.MK, 'K')) == '[1000000.0, 2000000.0]'
+    assert str(log10_filter([1e6, 1e7])) == '[6.0, 7.0]'
+
+
+def test_log10_filter_array(idl_env):
+    res = idl_env.run('foo = {{ foo | log10 }}', args={'foo': [1e6, 1e7]})
+    assert np.allclose(res['foo'], [6, 7])
 
 
 def test_string_list_filter(idl_env):
@@ -191,9 +225,9 @@ def test_custom_filters(idl_env):
     assert result['b'].decode('utf-8') == filters['my_filter'](args['b'])
 
 
-def test_invalid_script(idl_env):
+def test_invalid_script(render_env):
     with pytest.raises(ValueError, match='Input script must either be a string or path to a script.'):
-        _ = idl_env.run(None)
+        _ = render_env.render_script(None, {})
 
 
 def test_custom_header_footer(idl_env):

@@ -1,8 +1,8 @@
 """
 Read some default options if possible
 """
-import pathlib
 import configparser
+import pathlib
 
 HISSW_DIR = pathlib.Path.home() / '.hissw'
 HISSW_RC = HISSW_DIR / 'hisswrc'

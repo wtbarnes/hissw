@@ -16,14 +16,15 @@ def units_filter(quantity, unit):
     import astropy.units as u  # Avoid astropy as a hard dependency
     if not isinstance(quantity, u.Quantity):
         raise u.UnitsError(f'Value must be a quantity with units compatible with {unit}')
-    return quantity.to_value(unit)
+    # tolist: NumPy 2 scalars in a list print as np.float64(...), not valid IDL
+    return quantity.to_value(unit).tolist()
 
 
 def log10_filter(value):
     """
     Take the base 10 log of a given value.
     """
-    return np.log10(value)
+    return np.log10(value).tolist()  # see units_filter
 
 
 def string_list_filter(string_list):
