@@ -1,34 +1,56 @@
 """
 Module level tests
 """
-import pytest
-import hissw
-import numpy as np
 import astropy.units as u
-from hissw.util import SSWIDLError
+import numpy as np
+import pytest
 
-run_kwargs = {'verbose': True}
+import hissw
+from hissw.util import IDLNotFoundError, SSWIDLError, SSWNotFoundError
 
 
 @pytest.fixture
 def idl_env(idl_home):
-    return hissw.Environment(idl_home=idl_home, idl_only=True)
-
+    env = hissw.Environment(idl_home=idl_home, idl_only=True)
+    try:
+        _ = env.run('')
+    except IDLNotFoundError:
+        pytest.skip(f'Skipping IDL tests. No IDL installation found at {env.idl_home}.')
+    else:
+        return env
 
 @pytest.fixture
-def ssw_env(idl_home, ssw_home):
-    return hissw.Environment(idl_home=idl_home,
-                             ssw_home=ssw_home,
-                             ssw_packages=['sdo/aia'],
-                             ssw_paths=['aia'])
+def ssw_env(idl_env, ssw_home):
+    env = hissw.Environment(idl_home=idl_env.idl_home,
+                            ssw_home=ssw_home,
+                            ssw_packages=['sdo/aia'],
+                            ssw_paths=['aia'])
+    try:
+        _ = env.run('')
+    except SSWNotFoundError:
+        pytest.skip(f'Skipping SSW tests. No SSW installation found at {env.ssw_home}.')
+    else:
+        return env
 
 
-def test_exception(idl_env):
+def test_exception_idl_command(idl_env):
     """
     Test exception catching
     """
     with pytest.raises(SSWIDLError):
-        _ = idl_env.run('foobar', **run_kwargs)
+        _ = idl_env.run('foobar')
+
+
+def test_exception_missing_ssw(tmp_path):
+    env = hissw.Environment(idl_home=tmp_path, ssw_home=tmp_path)
+    with pytest.raises(SSWNotFoundError):
+        _ = env.run('')
+
+
+def test_exception_missing_idl(tmp_path):
+    env = hissw.Environment(idl_home=tmp_path, idl_only=True)
+    with pytest.raises(IDLNotFoundError):
+        _ = env.run('')
 
 
 def test_no_args(idl_env):
@@ -41,7 +63,7 @@ def test_no_args(idl_env):
     j = REBIN(TRANSPOSE(LINDGEN(n)), n, n)
     array = (i GE j)
     '''
-    results = idl_env.run(script, **run_kwargs)
+    results = idl_env.run(script)
     assert results['array'].shape == (5, 5)
 
 
@@ -51,13 +73,24 @@ def test_with_args(idl_env):
     """
     script = '''
     n = {{ n }}
-    i = REBIN(LINDGEN(n), n, n)           
+    i = REBIN(LINDGEN(n), n, n)
     j = REBIN(TRANSPOSE(LINDGEN(n)), n, n)
     array = (i GE j)
     '''
     n = 100
-    results = idl_env.run(script, args={'n': n}, **run_kwargs)
+    results = idl_env.run(script, args={'n': n})
     assert results['array'].shape == (n, n)
+
+
+@pytest.mark.parametrize(('log_level', 'log_record_length'), [
+    ('DEBUG', 5),
+    ('INFO', 2),
+    ('WARNING', 1),
+])
+def test_logging(idl_env, caplog, log_level, log_record_length):
+    caplog.set_level(log_level)
+    _ = idl_env.run('print, "Hello World"')
+    assert len(caplog.records) == log_record_length
 
 
 def test_aia_response_functions(ssw_env):
@@ -75,7 +108,7 @@ def test_aia_response_functions(ssw_env):
     resp335 = response.a335.tresp
     '''
     args = {'flags': ['temp', 'dn', 'timedepend_date', 'evenorm']}
-    results = ssw_env.run(script, args=args, **run_kwargs)
+    results = ssw_env.run(script, args=args)
     for c  in [94, 131, 171, 193, 211, 335]:
         assert f'resp{c}' in results
         assert results[f'resp{c}'].shape == results['logt'].shape
@@ -129,7 +162,7 @@ def test_default_ssw_var(ssw_env):
     foo = '{{ ssw_home }}'
     """
     res = ssw_env.run(script)
-    assert res['foo'].decode('utf-8') == ssw_env.ssw_home
+    assert res['foo'].decode('utf-8') == str(ssw_env.ssw_home)
 
 
 def test_script_from_file(idl_env, tmp_path):
@@ -143,11 +176,11 @@ def test_script_from_file(idl_env, tmp_path):
     assert result['foo'] == (a + b)
 
 
-def test_custom_filters(idl_home):
+def test_custom_filters(idl_env):
     filters = {
         'my_filter': lambda x: 'foo' if x < 0.5 else 'bar'
     }
-    env = hissw.Environment(idl_home=idl_home, idl_only=True, filters=filters)
+    env = hissw.Environment(idl_home=idl_env.idl_home, idl_only=True, filters=filters)
     script = '''
     a = '{{ a | my_filter }}'
     b = '{{ b | my_filter }}'
@@ -163,10 +196,10 @@ def test_invalid_script(idl_env):
         _ = idl_env.run(None)
 
 
-def test_custom_header_footer(idl_home):
+def test_custom_header_footer(idl_env):
     header = 'foo = {{ a }}'
     footer = 'bar = {{ a }} + {{ b }}'
-    env_custom = hissw.Environment(idl_home=idl_home, idl_only=True,
+    env_custom = hissw.Environment(idl_home=idl_env.idl_home, idl_only=True,
                                    header=header, footer=footer)
     script = '''
     print, {{ a }}
@@ -214,4 +247,3 @@ def test_force_double_precision_filter_with_quantity(var, idl_env):
     result = idl_env.run('var = {{ var | to_unit("h") | force_double_precision }}',
                          args={'var': var})
     assert u.allclose(var.to_value('h'), result['var'], atol=0.0, rtol=0.0)
-

@@ -5,7 +5,7 @@ import hissw
 import matplotlib.pyplot as plt
 script = '''
 n = 5
-i = REBIN(LINDGEN(n), n, n)           
+i = REBIN(LINDGEN(n), n, n)
 j = REBIN(TRANSPOSE(LINDGEN(n)), n, n)
 mask = (i GE j)
 '''
@@ -22,7 +22,7 @@ But what if we want to input the size of our upper triangular array with Python?
 ```python
 script = '''
 n = {{ n }}
-i = REBIN(LINDGEN(n), n, n)           
+i = REBIN(LINDGEN(n), n, n)
 j = REBIN(TRANSPOSE(LINDGEN(n)), n, n)
 mask = (i GE j)
 '''

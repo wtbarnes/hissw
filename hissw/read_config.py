@@ -1,8 +1,6 @@
 """
 Read some default options if possible
 """
-
-import os
 import pathlib
 import configparser
 
