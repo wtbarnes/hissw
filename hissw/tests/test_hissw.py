@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 
 import hissw
+from hissw.filters import log10_filter, units_filter
 from hissw.util import IDLNotFoundError, SSWIDLError, SSWNotFoundError
 
 
@@ -146,6 +147,16 @@ def test_log10_filter(idl_env):
     foo = 1e6
     res = idl_env.run(script, args={'foo': foo})
     assert res['foo'] == np.log10(foo)
+
+
+def test_filters_render_arrays_as_valid_idl():
+    assert str(units_filter([1, 2]*u.MK, 'K')) == '[1000000.0, 2000000.0]'
+    assert str(log10_filter([1e6, 1e7])) == '[6.0, 7.0]'
+
+
+def test_log10_filter_array(idl_env):
+    res = idl_env.run('foo = {{ foo | log10 }}', args={'foo': [1e6, 1e7]})
+    assert np.allclose(res['foo'], [6, 7])
 
 
 def test_string_list_filter(idl_env):
