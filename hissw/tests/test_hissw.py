@@ -9,7 +9,8 @@ import numpy as np
 import pytest
 
 import hissw
-from hissw.filters import log10_filter, units_filter
+from hissw.filters import (force_double_precision_filter, log10_filter,
+                           units_filter)
 from hissw.util import IDLNotFoundError, SSWIDLError, SSWNotFoundError
 
 
@@ -315,6 +316,20 @@ def test_force_double_precision_filter(var, idl_env):
     # NOTE: 5 corresponds to double-precision floating point. See
     # https://www.l3harrisgeospatial.com/docs/make_array.html#TYPE
     assert result['var_size'][len(result['var'].shape) + 1] == 5
+
+
+def test_force_double_precision_filter_special_values():
+    assert force_double_precision_filter(np.int64(3)) == '3d / 1d'
+    assert (force_double_precision_filter((0.5, np.nan, -np.inf))
+            == '[1d / 2d,!values.d_nan,-!values.d_infinity]')
+
+
+def test_force_double_precision_filter_non_finite(idl_env):
+    var = [0.1, np.nan, np.inf, -np.inf]
+    result = idl_env.run('var = {{ var | force_double_precision }}', args={'var': var})
+    # NOTE: unlike allclose, this treats NaN as equal to NaN
+    np.testing.assert_array_equal(result['var'], var)
+    assert result['var'].dtype.itemsize == 8
 
 
 @pytest.mark.parametrize('var', [

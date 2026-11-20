@@ -51,7 +51,7 @@ def force_double_precision_filter(value):
     IDL into Python. When used in combination with other filters, this filter should
     be used last as it forces a conversion to a list of strings.
     """
-    if isinstance(value, (np.ndarray, list)):
+    if isinstance(value, (np.ndarray, list, tuple)):
         str_list = [force_double_precision_filter(x) for x in value]
         # NOTE: this has to be done manually because each entry is formatted as a
         # string such that the division is not evaluated in Python. However, we
@@ -59,5 +59,11 @@ def force_double_precision_filter(value):
         return f"[{','.join(str_list)}]"
     else:
         # If it is neither an array or list,
+        value = float(value)  # NumPy integers have no as_integer_ratio
+        # NaN and infinity have no integer ratio, so use IDL's own names for them
+        if np.isnan(value):
+            return '!values.d_nan'
+        if np.isinf(value):
+            return ('-' if value < 0 else '') + '!values.d_infinity'
         a, b = value.as_integer_ratio()
         return f'{a}d / {b}d'
