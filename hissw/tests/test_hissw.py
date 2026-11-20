@@ -118,6 +118,12 @@ def test_logging(idl_env, caplog, log_level, log_record_length):
     assert len(caplog.records) == log_record_length
 
 
+def test_non_utf8_output(idl_env):
+    # 197B is a Latin-1 Angstrom sign, which is not valid UTF-8
+    res = idl_env.run("a = 1\nprint, string(197B)")
+    assert res['a'] == 1
+
+
 def test_missing_argument_raises(render_env):
     with pytest.raises(jinja2.UndefinedError, match="'a' is undefined"):
         render_env.render_script('foo = {{ a }} + 1', {'A': 5})

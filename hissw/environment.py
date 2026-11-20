@@ -236,6 +236,8 @@ class Environment:
             shell=True,
             capture_output=True,
             text=True,
+            # IDL output is not always UTF-8, and a stray byte must not cost the results
+            errors='replace',
             env=env,
         )
         self._check_for_errors(cmd_output, raise_exceptions=raise_exceptions)
