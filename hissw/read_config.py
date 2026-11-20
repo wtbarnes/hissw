@@ -8,13 +8,8 @@ HISSW_DIR = pathlib.Path.home() / '.hissw'
 HISSW_RC = HISSW_DIR / 'hisswrc'
 
 
-defaults = {}
-defaults['hissw_home'] = HISSW_DIR
-if HISSW_RC.is_file():
-    config = configparser.ConfigParser()
-    config.read(HISSW_RC)
-    for key in config['hissw']:
-        defaults[key] = config['hissw'][key]
-else:
-    defaults['ssw_home'] = None
-    defaults['idl_home'] = None
+defaults = {'hissw_home': HISSW_DIR, 'ssw_home': None, 'idl_home': None}
+config = configparser.ConfigParser()
+config.read(HISSW_RC)  # a missing file is skipped
+if config.has_section('hissw'):
+    defaults.update(config['hissw'])

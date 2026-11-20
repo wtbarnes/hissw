@@ -2,6 +2,8 @@
 Module level tests
 """
 import os
+import subprocess
+import sys
 
 import astropy.units as u
 import jinja2
@@ -351,3 +353,19 @@ def test_force_double_precision_filter_with_quantity(var, idl_env):
     result = idl_env.run('var = {{ var | to_unit("h") | force_double_precision }}',
                          args={'var': var})
     assert u.allclose(var.to_value('h'), result['var'], atol=0.0, rtol=0.0)
+
+
+@pytest.mark.parametrize(('config', 'expected'), [
+    ('[hissw]\nssw_home=/my/ssw\nidl_home=/my/idl\n', ['/my/ssw', '/my/idl']),
+    ('', ['None', 'None']),  # no [hissw] section
+])
+def test_config_file(config, expected, tmp_path):
+    # The config file is read at import time, so import hissw in a new process
+    # whose home directory is tmp_path
+    (tmp_path / '.hissw').mkdir()
+    (tmp_path / '.hissw' / 'hisswrc').write_text(config)
+    code = 'import hissw; print(hissw.defaults["ssw_home"], hissw.defaults["idl_home"])'
+    env = {**os.environ, 'HOME': str(tmp_path), 'USERPROFILE': str(tmp_path)}
+    output = subprocess.run([sys.executable, '-c', code], check=True, capture_output=True,
+                            text=True, env=env)
+    assert output.stdout.split() == expected
