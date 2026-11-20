@@ -31,11 +31,11 @@ keywords = [
     "sswidl",
     "solarsoft",
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.13"
 dependencies = [
-    "jinja2",
-    "numpy",
-    "scipy",
+    "jinja2>=3.1.5",
+    "numpy>=2.3.0",
+    "scipy>=1.15.0",
 ]
 
 [project.urls]
@@ -45,9 +45,9 @@ Source = "https://github.com/wtbarnes/hissw/"
 
 [project.optional-dependencies]
 all = ["hissw"]
-astropy = ["hissw", "astropy"]
-test = ["hissw[all]", "pytest", "astropy"]
-docs = ["hissw[all]", "mkdocs", "mkdocs-material"]
+astropy = ["hissw", "astropy>=6.1.7"]
+test = ["hissw[all]", "pytest>=8.3.4", "astropy>=6.1.7"]
+docs = ["hissw[all]", "mkdocs>=1.6.0", "mkdocs-material>=9.5.46"]
 dev = ["hissw[test,docs]"]
 
 [tool.setuptools.packages.find]
@@ -66,7 +66,7 @@ testpaths = ["hissw"]
 skip = "*.fts,*.fits,venv,*.pro,*.asdf,*.sh"
 
 [tool.ruff]
-target-version = "py39"
+target-version = "py313"
 line-length = 110
 exclude=[
     ".git,",
