@@ -52,6 +52,7 @@ $ pytest
 * Relies on executing shell commands with the `subprocess` module. I've only tested this on Linux and macOS. **Windows users may encounter difficulties.**
 * Be careful when injecting large pieces of data into your IDL script as this must be written to a file. It may be better to load it at (IDL) runtime.
 * Widgets and plotting will (likely) **not** work
+* Scripts are Jinja templates, so `{{`, `{%` and `{#` in your IDL code are read as Jinja syntax. Wrap such code in a raw block, e.g. `{% raw %}print, 1, format='(%"{%d}")'{% endraw %}`.
 * This has **not** been tested extensively against all SSW/IDL functionality. There are likely many cases where hissw will not work. [Bug reports](https://github.com/wtbarnes/hissw/issues) and [pull requests](https://github.com/wtbarnes/hissw/pulls) welcome!
 
 ## A Note on Preserving Precision between Python and IDL
