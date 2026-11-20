@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-    "setuptools",
+    "setuptools>=77",
     "setuptools_scm[toml]",
     "wheel",
 ]
@@ -11,7 +11,8 @@ name = "hissw"
 dynamic = ["version"]
 description = "Seamlessly integrate SSWIDL code into your Python workflow"
 readme = {file="README.md", content-type = "text/markdown"}
-license = { file = "LICENSE.rst" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
     {name="Will Barnes", email="will.t.barnes@gmail.com"},
     {name="Bin Chen"},
@@ -19,7 +20,6 @@ authors = [
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
 ]
 keywords = [
