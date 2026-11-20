@@ -17,11 +17,9 @@ jobs:
       posargs: '--log-level=DEBUG'
       toxdeps: tox-pypi-filter
       envs: |
-        - macos: py313
-        - windows: py313
-        - linux: py313
-        - linux: py314
         - linux: py315
+        - macos: py314
+        - windows: py313
         - linux: py313-oldestdeps
   sdist_verify:
     runs-on: ubuntu-latest
