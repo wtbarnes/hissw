@@ -378,6 +378,12 @@ def test_config_file(config, expected, tmp_path):
     assert output.stdout.split() == expected
 
 
+def test_verbose_is_deprecated(idl_env):
+    with pytest.warns(DeprecationWarning, match='verbose'):
+        res = idl_env.run('a = 1', verbose=False)
+    assert res['a'] == 1
+
+
 def test_save_vars(idl_env):
     res = idl_env.run("a = 1\nb = 2", save_vars=['a'])
     assert list(res) == ['a']

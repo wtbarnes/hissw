@@ -6,6 +6,7 @@ import os
 import pathlib
 import subprocess
 import tempfile
+import warnings
 
 import jinja2
 from scipy.io import readsav
@@ -173,7 +174,7 @@ class Environment:
                   'command_filename': command_filename}
         return self.env.get_template('startup.sh').render(**params)
 
-    def run(self, script, args=None, save_vars=None, raise_exceptions=True):
+    def run(self, script, args=None, save_vars=None, raise_exceptions=True, verbose=None):
         """
         Set up the SSWIDL environment and run the supplied scripts.
 
@@ -189,7 +190,12 @@ class Environment:
             If True, raise an exception based on the IDL output. This is left
             as a flag because not raising an exception is sometimes useful
             for debugging.
+        verbose : bool, optional
+            Deprecated and ignored. IDL output is sent to the ``hissw`` logger.
         """
+        if verbose is not None:
+            warnings.warn('The verbose keyword is deprecated and has no effect. IDL output '
+                          'is sent to the "hissw" logger.', DeprecationWarning, stacklevel=2)
         # NOTE: Check the paths rather than the shell's error messages, which
         # are only produced where tcsh is installed.
         if not self.idl_only and not (self.ssw_home.expanduser() / 'gen' / 'setup' / 'setup.ssw').is_file():
