@@ -11,7 +11,8 @@ import numpy as np
 import pytest
 
 import hissw
-from hissw import IDLNotFoundError, SSWIDLError, SSWNotFoundError
+from hissw import (IDLLicenseError, IDLNotFoundError, SSWIDLError,
+                   SSWNotFoundError)
 from hissw.filters import (force_double_precision_filter, log10_filter,
                            units_filter)
 
@@ -375,3 +376,45 @@ def test_config_file(config, expected, tmp_path):
     output = subprocess.run([sys.executable, '-c', code], check=True, capture_output=True,
                             text=True, env=env)
     assert output.stdout.split() == expected
+
+
+def test_save_vars(idl_env):
+    res = idl_env.run("a = 1\nb = 2", save_vars=['a'])
+    assert list(res) == ['a']
+
+
+def test_extra_paths(idl_env, tmp_path):
+    (tmp_path / 'hissw_test_double.pro').write_text(
+        'function hissw_test_double, x\n  return, 2*x\nend\n')
+    env = hissw.Environment(idl_home=idl_env.idl_home, idl_only=True, extra_paths=[tmp_path])
+    assert env.run('a = hissw_test_double(2)')['a'] == 4
+
+
+def test_raise_exceptions_false(idl_env):
+    # A run where something reports a halt, but the script still saves its results
+    script = "a = 1\nprintf, -2, '% Execution halted at: SOME_STARTUP_ROUTINE'"
+    with pytest.raises(SSWIDLError):
+        idl_env.run(script)
+    assert idl_env.run(script, raise_exceptions=False)['a'] == 1
+
+
+def test_license_error(render_env):
+    # The message IDL 9.3 prints when it cannot find a licence
+    output = subprocess.CompletedProcess([], 0, stdout='', stderr='% Failed to acquire license.')
+    with pytest.raises(IDLLicenseError):
+        render_env._check_for_errors(output)
+
+
+def test_header_footer_from_file(idl_env, tmp_path):
+    (tmp_path / 'header.pro').write_text('foo = {{ a }}')
+    (tmp_path / 'footer.pro').write_text('bar = foo + {{ b }}')
+    env = hissw.Environment(idl_home=idl_env.idl_home, idl_only=True,
+                            header=tmp_path / 'header.pro', footer=tmp_path / 'footer.pro')
+    result = env.run('baz = foo', args={'a': 1, 'b': 2})
+    assert (result['foo'], result['bar'], result['baz']) == (1, 3, 1)
+
+
+def test_args_not_modified(idl_env):
+    args = {'n': 5}
+    idl_env.run('a = {{ n }}', args=args)
+    assert args == {'n': 5}
